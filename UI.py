@@ -1,6 +1,7 @@
 from tkinter import * 
 from tkinter import ttk
 from tkinter import filedialog
+from tkinter import colorchooser
 import Functions as F
 
 F.Test()
@@ -20,7 +21,7 @@ def NewAccount():
     t = ttk.Frame(a)
     ttk.Label(t, text = "Account Name:").grid(row = 0, column = 0)
     ttk.Entry(t).grid(row = 0, column = 1)
-    ttk.Label(t, text = "Account Type").grid(row = 1, column = 0)
+    ttk.Label(t, text = "Account Type:").grid(row = 1, column = 0)
     ttk.Radiobutton(t,text = "Credit", variable = AType, value = "Credit", command = lambda:P(AType)).grid(row = 2, column = 0)
     ttk.Radiobutton(t,text = "Debt", variable = AType, value = "Debt", command = lambda:P(AType)).grid(row = 2, column = 1)
     ttk.Button(t, text = "Continue", command = a.destroy).grid(row = 3, column =  2)
@@ -32,9 +33,9 @@ def NewProfile():
     t = ttk.Frame(a)
     #Name, Location, Password
     ttk.Label(t, text = "Name: ").grid(row = 2, column = 0)
-    ttk.Label(t, text = "Password").grid(row = 3, column = 0)
-    ttk.Label(t, text = "Confirm Password").grid(row = 4, column = 0)
-    ttk.Label(t, text = "File Directory").grid(row = 5, column = 0)
+    ttk.Label(t, text = "Password:").grid(row = 3, column = 0)
+    ttk.Label(t, text = "Confirm Password:").grid(row = 4, column = 0)
+    ttk.Label(t, text = "File Directory:").grid(row = 5, column = 0)
     Name = ttk.Entry(t).grid(row = 2, column = 1)
     Password = ttk.Entry(t).grid(row = 3, column = 1)
     PasswordConfirm = ttk.Entry(t).grid(row = 4, column = 1)
@@ -52,6 +53,47 @@ def LoadProfile():
     ttk.Entry(t).grid(row = 0, column = 1)
     ttk.Button(t, text = "Continue", command = a.destroy).grid(row = 0, column =  2)
     t.grid()
+
+def NewIncome():
+    a = Toplevel(root)
+    a.title("New Income Catagory")
+    t = ttk.Frame(a)
+    
+    ttk.Label(t, text = "Catagory Name:").grid(row = 0, column = 0)
+    ttk.Entry(t).grid(row = 0, column = 1)
+
+    AType = StringVar(a,"Credit")
+    ttk.Label(t, text = "Recurring:").grid(row = 1, column = 0)
+    ttk.Radiobutton(t,text = "True", variable = AType, value = "True", command = lambda:P(AType)).grid(row = 2, column = 0)
+    ttk.Radiobutton(t,text = "False", variable = AType, value = "False", command = lambda:P(AType)).grid(row = 2, column = 1)
+    clr = '#aa0120'
+    ttk.Label(t, text = "Color").grid(row = 3, column = 0)
+    Button(t,bg = clr,command = lambda: colorchooser.askcolor(initialcolor=clr)).grid(row = 3, column = 1)
+    
+    
+    ttk.Button(t, text = "Continue", command = a.destroy).grid(row = 4, column =  2)
+    t.grid()
+
+def NewExpense():
+    a = Toplevel(root)
+    a.title("New Expense Catagory")
+    t = ttk.Frame(a)
+    
+    ttk.Label(t, text = "Catagory Name:").grid(row = 0, column = 0)
+    ttk.Entry(t).grid(row = 0, column = 1)
+
+    AType = StringVar(a,"Credit")
+    ttk.Label(t, text = "Recurring:").grid(row = 1, column = 0)
+    ttk.Radiobutton(t,text = "True", variable = AType, value = "True", command = lambda:P(AType)).grid(row = 2, column = 0)
+    ttk.Radiobutton(t,text = "False", variable = AType, value = "False", command = lambda:P(AType)).grid(row = 2, column = 1)
+
+    clr = '#aa0120'
+    ttk.Label(t, text = "Color").grid(row = 3, column = 0)
+    Button(t,bg = clr,command = lambda: colorchooser.askcolor(initialcolor=clr)).grid(row = 3, column = 1)
+    
+    ttk.Button(t, text = "Continue", command = a.destroy).grid(row = 4, column =  2)
+    t.grid()
+    
 
     
     
@@ -114,7 +156,7 @@ ExpChart.grid(column = 4, row = 4, rowspan = 2)
 
 #Page 2 Overview
 ttk.Label(p2, text = "Income").grid(row = 0, column = 0, sticky = 'w')
-ttk.Button(p2, text = "New Entry").grid(row = 0, column = 1)
+ttk.Button(p2, text = "New Entry",command = NewIncome).grid(row = 0, column = 1)
 Fr = ttk.Frame(p2)#for Pie Chart
 text =Entry(p2).grid(row =1 , column = 0)
                                         
@@ -132,7 +174,7 @@ Fr.grid(row = 2, column = 1)
 
 #Page 3
 ttk.Label(p3, text = "Income").grid(row = 0, column = 0)
-ttk.Button(p3, text = "New Entry").grid(row = 0, column = 1)
+ttk.Button(p3, text = "New Entry",command = NewExpense).grid(row = 0, column = 1)
 ttk.Frame(p3).grid(row = 1, column = 1) #for Pie Chart
                                         
                                           
@@ -150,7 +192,7 @@ IncomeTable.grid(row = 1,column = 0, sticky = 'nse')
 #Page 4
 
 ttk.Label(p4, text = "Accounts Over Time").grid(row = 0, column = 0)
-ttk.Button(p4, text = "Save Current Values").grid(row = 0, column = 1)
+ttk.Button(p4, text = "Record Current Values").grid(row = 0, column = 1)
 ttk.Frame(p4).grid(row = 1, column = 1) #for Pie Chart
                                         
                                           
@@ -167,6 +209,13 @@ AccountTable.grid(row = 1,column = 0, sticky = 'nse')
 #Page 5
 
 #Page 6
+ttk.Label(p6, text = "Recurring Transactions").grid(row = 0, column = 0, sticky = 'w')
+ttk.Button(p6, text = "New Recurring Transaction").grid(row = 1, column = 5)
+
+G = ttk.Frame(p6)
+ttk.Label(G,text = "Recurring Income").grid(row = 0, column = 0, sticky = 'w')
+ttk.Label(G,text = "Recurring Expenses").grid(row = 0, column = 3, sticky = 'w')
+G.grid(row = 1, column = 0, rowspan = 6)
 
 #Page 7
 ttk.Label(p7, text = "Records: ").grid(row = 0, column = 0, sticky = 'w')

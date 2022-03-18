@@ -20,6 +20,7 @@ class Expense:
         self.catagory = name
         self.currentvalue = 0
         self.pastvalues = {}
+        self.recurring = "False"
 
     def New_Value(self,date,expense):
         self.pastvalues[date] = expense
@@ -36,6 +37,7 @@ class Income:
         self.catagory = name
         self.currentvalue = 0
         self.pastvalues = {}
+        self.recurring = "False"
 
     def New_Value(self,date,income):
         self.pastvalues[date] = income
@@ -97,6 +99,7 @@ class Dates:
 #Delete Recurring Transaction
 
 #Save Records
+
 
 
 if __name__ == '__main__':
