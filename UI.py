@@ -173,15 +173,11 @@ ExpenseTable.grid(row = 2,column = 0, sticky = 'nsew')
 Fr.grid(row = 2, column = 1) 
 
 #Page 3
+ttk.Frame(p3).grid(row = 1, column = 1) #for Pie Chart
 ttk.Label(p3, text = "Income").grid(row = 0, column = 0)
 ttk.Button(p3, text = "New Entry",command = NewExpense).grid(row = 0, column = 1)
-ttk.Frame(p3).grid(row = 1, column = 1) #for Pie Chart
-                                        
-                                          
-columns = ["1","2","3","4"]
 
 IncomeTable = ttk.Treeview(p3,columns = columns)
-
 IncomeTable.heading("1", text = "Type 1")
 IncomeTable.heading("2", text = "Type 2")
 IncomeTable.heading("3", text = "Type 3")

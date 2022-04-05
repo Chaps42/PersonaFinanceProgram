@@ -4,12 +4,14 @@ from tkinter import filedialog
 from tkinter import colorchooser
 
 import FileTypes as ft
+import Windows as win
+import UIElements as ui
 
 class MainGui:
 
     def __init__(self,master):
         self.master = master
-        self.Profile = ft.Profile("Emptyyy","Password")
+        self.Profile = ft.Profile("Emptyyy","Password","/Users/DavidChaparro/Desktop/Personal Projects/PersonaFinanceProgram")
 
         ####Initialize Master Frame for all pages#####
         self.frame =  ttk.Notebook(self.master)
@@ -29,39 +31,28 @@ class MainGui:
         self.frame.add(self.p7, text = "Records")
 
         #Test Values
-        self.Accounts = ["Account A", "Account B", "Account C"]
-        self.Debts = ["Debt A", "Debt B", "Debt C"]
+        self.columns = ["1","2","3","4"]
         self.Expenses = ["Expense A","Expense B","Expense C"]
         self.Incomes = ["Income A", "Income B", "Income C"]
-        self.columns = ["1","2","3","4"]
+
+
 
         #####Page 1#####
         ttk.Label(self.p1, text = "Account Overview").grid(column = 0, row = 0, sticky = 'w')
+        ttk.Label(self.p1, text = "Current Profile: "+self.Profile.name).grid(column = 1, row = 0, sticky = 'w')
         ttk.Button(self.p1, text = "New Profile",command = self.New_Profile).grid(column = 0, row = 1)
         ttk.Button(self.p1, text = "Load Profile",command = self.Load_Profile).grid(column = 0, row = 2)
-        ttk.Button(self.p1, text = "Record Account Values").grid(column = 5, row = 2)
-        ttk.Button(self.p1, text = "Save").grid(column = 5, row = 5)
-        ttk.Label(self.p1, text = "Date:").grid(column = 4, row = 1)
-        ttk.Entry(self.p1).grid(column = 5, row = 1)
+        ttk.Button(self.p1, text = "Save",command = self.BKSave).grid(column = 5, row = 5)
         self.Utilization = ttk.Frame(self.p1)
-        self.Acc = ttk.Frame(self.p1)
         self.ExpChart = ttk.Frame(self.p1)
 
-        ttk.Button(self.p1, text = "Test",command = self.test).grid(column = 5, row = 6)
+        self.Acc = ttk.Button(self.p1, text = "Test",command = self.test).grid(column = 5, row = 6)
         
-        ttk.Label(self.Acc, text = "Accounts").grid(row = 0, column = 0,sticky = 'w')
-        ttk.Button(self.Acc, text = "New Account",command = self.New_Account).grid(row = 0, column = 1)
-        ttk.Label(self.Acc, text = "Assets").grid(row = 1, column = 0,sticky = 'w')
-        ttk.Label(self.Acc, text = "Debts").grid(row = 1, column = 1,sticky = 'w')
-        for i in range(len(self.Accounts)):
-            ttk.Label(self.Acc, text = self.Accounts[i]).grid(row = 2+2*i, column = 0,sticky = 'w')
-            ttk.Entry(self.Acc).grid(row = 3+2*i, column = 0)
-        for i in range(len(self.Debts)):
-            ttk.Label(self.Acc, text = self.Debts[i]).grid(row = 2+2*i, column = 1,sticky = 'w')
-            ttk.Entry(self.Acc).grid(row = 3+2*i, column = 1)
+        #Initialize account list here
+        ACCLIST = ui.AccountList(self.p1,self.Profile.accounts,self.New_Account,self.Del_Account,self.BKRecAcc)
 
         self.Utilization.grid(column = 0, row = 4, rowspan = 2)
-        self.Acc.grid(column = 2, row = 4, rowspan = 2)
+        ACCLIST.Acc.grid(column = 2, row = 4, rowspan = 2)
         self.ExpChart.grid(column = 4, row = 4, rowspan = 2)
     
 
@@ -128,141 +119,74 @@ class MainGui:
         #.grid all items to make them real
         self.frame.grid()
         
-    def Update_Profile(self):
-        self.Profile = self.app.Profile
-        #self.Update_Profile()
-
 
     #####New Window Functions#####
-    def New_Profile(self):
+    def New_Profile(self): #CHECK#
         self.NewWindow = tk.Toplevel(self.master)
         self.NewWindow.title("New Profile")
-        self.app = NewProfile(self.NewWindow,self)
-        print("HI1")
+        self.app = win.WinNewProfile(self.NewWindow,self.BKOverwrite_Profile)
 
     def Load_Profile(self):
         self.NewWindow = tk.Toplevel(self.master)
         self.NewWindow.title("Load Profile")
-        self.app = LoadProfile(self.NewWindow)
+        self.app = win.WinLoadProfile(self.NewWindow,self.BKOverwrite_Profile)
 
     def New_Account(self):
         self.NewWindow = tk.Toplevel(self.master)
         self.NewWindow.title("New Account Details")
-        self.app = NewAccount(self.NewWindow)
+        self.app = win.WinNewAccount(self.NewWindow,self.BKNew_Acc)
+
+    def Del_Account(self):
+        self.NewWindow = tk.Toplevel(self.master)
+        self.NewWindow.title("New Account Details")
+        self.app = win.WinDelAccount(self.NewWindow,self.Profile.accounts,self.BKDel_Acc)
 
     def New_IncExp(self):
         self.NewWindow = tk.Toplevel(self.master)
         self.NewWindow.title("New Income/Expense")
-        self.app = NewIncExp(self.NewWindow)
+        self.app = win.WinNewIncExp(self.NewWindow,self.BKNewIncExp)
 
     def Del_IncExp(self):
         self.NewWindow = tk.Toplevel(self.master)
         self.NewWindow.title("New Income")
-        self.app = NewIncome(self.NewWindow)
+        self.app = win.WinNewIncome(self.NewWindow)
 
+    #####PassBack Functions#####
+
+    def BKOverwrite_Profile(self,NewProfile):
+        self.Profile = NewProfile
+        print("New Profile Created")
+
+    def BKNewIncExp(self,name,Type,Color):
+        self.Profile.New_IncExp_Catagory(name,Type,Color)
+        print("New Catagory Created")
+
+    def BKDelIncExp(self,name):
+        self.Profile.New_IncExp_Catagory(name,Type,Color)
+        print("Catagory Deleted")    
+
+    def BKNew_Acc(self,name,Type,Color):
+        self.Profile.New_Account(name,Type,Color)
+        print("New Account created")
+        ACCLIST = ui.AccountList(self.p1,self.Profile.accounts,self.New_Account,self.Del_Account,self.BKRecAcc)
+        ACCLIST.Acc.grid(column = 2, row = 4, rowspan = 2)
+
+    def BKDel_Acc(self,name):
+        self.Profile.Delete_Account(name)
+        print(" Account deleted")
+        ACCLIST = ui.AccountList(self.p1,self.Profile.accounts,self.New_Account,self.Del_Account)
+        ACCLIST.Acc.grid(column = 2, row = 4, rowspan = 2)
+
+    def BKSave(self):
+        self.Profile.Save_Profile(self.Profile.directory)
+
+    def BKRecAcc(self):
+        print("Bruh")
+
+           
     def test(self):
-        print(self.app.Profile.name)
-        print(self.app.master)
+        print(self.Profile.accounts)
 
-
-#New Window Classes
-        
-class NewProfile:
-    def __init__(self,master,main):
-        self.master = master
-        print("Hi2")
-
-
-        #Initialize values for accounts
-        self.Profile = ft.Profile("EmptyInClass","Password")
-        self.Name = tk.StringVar()
-        self.Password = tk.StringVar()
-        self.PasswordConfirm = tk.StringVar()
-        self.FileDirectory = tk.StringVar()
-        
-        self.t = ttk.Frame(self.master)
-        #Name, Location, Password
-        ttk.Label(self.t, text = "Name: ").grid(row = 2, column = 0)
-        ttk.Label(self.t, text = "Password:").grid(row = 3, column = 0)
-        ttk.Label(self.t, text = "Confirm Password:").grid(row = 4, column = 0)
-        ttk.Label(self.t, text = "File Directory:").grid(row = 5, column = 0)
-        ttk.Entry(self.t,textvariable = self.Name).grid(row = 2, column = 1,columnspan = 2)
-        ttk.Entry(self.t,textvariable = self.Password).grid(row = 3, column = 1,columnspan = 2)
-        ttk.Entry(self.t,textvariable = self.PasswordConfirm).grid(row = 4, column = 1,columnspan = 2)
-        ttk.Entry(self.t,textvariable = self.FileDirectory).grid(row = 5, column = 1,columnspan = 2)
-
-        #Continue and save new profile
-        ttk.Button(self.t, text = "Continue", command = self.New_Profile).grid(row = 6, column =  2)
-        ttk.Button(self.t, text = "Cancel", command = self.master.destroy).grid(row = 6, column = 1)
-        self.t.grid()
-
-    def New_Profile(self):
-        if self.Password.get() == self.PasswordConfirm.get():
-            self.Profile = ft.Profile(self.Name.get(),self.Password.get())
-            self.Profile.Save_Profile(self.FileDirectory.get())
-            self.master.destroy()
-            print("Hi3")
-            
-        if self.Password.get() != self.PasswordConfirm.get():
-            ttk.Label(self.t,text = "Passwords do not match", foreground='red').grid(row = 6,column = 1)
-
-
-    
-class LoadProfile:
-    def __init__(self,master):
-        self.master = master
-        
-        self.filename = tk.filedialog.askopenfilename()
-
-        self.t = ttk.Frame(self.master)
-        ttk.Label(self.t, text = "Password").grid(row = 0, column = 0)
-        ttk.Entry(self.t).grid(row = 0, column = 1)
-        ttk.Button(self.t, text = "Continue", command = self.master.destroy).grid(row = 0, column =  2)
-        self.t.grid()
-
-class NewAccount:
-    def __init__(self,master):
-        self.master = master
-        self.AType = tk.StringVar(self.master,"Credit")
-
-        self.t = ttk.Frame(self.master)
-        ttk.Label(self.t, text = "Account Name:").grid(row = 0, column = 0)
-        ttk.Entry(self.t).grid(row = 0, column = 1)
-        ttk.Label(self.t, text = "Account Type:").grid(row = 1, column = 0)
-        ttk.Radiobutton(self.t,text = "Credit", variable = self.AType, value = "Credit", command = lambda:P(AType)).grid(row = 2, column = 0)
-        ttk.Radiobutton(self.t,text = "Debt", variable = self.AType, value = "Debt", command = lambda:P(AType)).grid(row = 2, column = 1)
-        ttk.Button(self.t, text = "Continue", command = self.master.destroy).grid(row = 3, column =  2)
-        self.t.grid()
-
-class NewIncExp:
-    def __init__(self,master):
-        self.master = master
-        self.t = ttk.Frame(self.master)
-
-        self.Name = tk.StringVar()
-        self.Color = tk.StringVar()
-        self.Type = tk.StringVar(value = 'Asset')
-
-        self.values = {"RadioButton 1":'Asset', "RadioButton 2":'Debt'}
-        
-        ttk.Label(self.t, text = "Catagory Name:").grid(row = 0, column = 0)
-        ttk.Entry(self.t,textvariable = self.Name).grid(row = 0, column = 1,columnspan = 2)
-
-        self.AType = tk.StringVar(self.master,"Credit")
-        ttk.Label(self.t, text = "Type:").grid(row = 1, column = 0)
-        ttk.Radiobutton(self.t,text = "Asset", variable = self.Type, value = "Asset").grid(row = 1, column = 1)
-        ttk.Radiobutton(self.t,text = "Debt", variable = self.Type, value = "Debt").grid(row = 1, column = 2)
-        clr = '#aa0120'
-        ttk.Label(self.t, text = "Color").grid(row = 3, column = 0)
-        ttk.Button(self.t,command = lambda: colorchooser.askcolor(initialcolor=clr)).grid(row = 3, column = 1,columnspan = 2)
-        
-        
-        ttk.Button(self.t, text = "Continue", command = self.New_Catagory).grid(row = 4, column =  2)
-        self.t.grid()
-
-    def New_Catagory(self):
-        ft.IncExpCatagory(self.Name.get(),self.Type.get(),self.Color.get())
-        self.master.destroy()
         
 
 def main():
