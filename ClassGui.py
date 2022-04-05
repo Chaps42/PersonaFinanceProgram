@@ -47,29 +47,29 @@ class MainGui:
         self.ExpChart = ttk.Frame(self.p1)
 
         self.Acc = ttk.Button(self.p1, text = "Test",command = self.test).grid(column = 5, row = 6)
-        
+
         #Initialize account list here
         ACCLIST = ui.AccountList(self.p1,self.Profile.accounts,self.New_Account,self.Del_Account,self.BKRecAcc)
 
         self.Utilization.grid(column = 0, row = 4, rowspan = 2)
         ACCLIST.Acc.grid(column = 2, row = 4, rowspan = 2)
         self.ExpChart.grid(column = 4, row = 4, rowspan = 2)
-    
+
 
         #####Page 2#####
-                                                                    
-        self.PieChartIncome = ttk.Frame(self.p2) 
+
+        self.PieChartIncome = ttk.Frame(self.p2)
         ttk.Label(self.p2, text = "Income").grid(row = 0, column = 0, sticky = 'w')
         ttk.Button(self.p2, text = "New Entry",command = self.New_IncExp).grid(row = 0, column = 1)
         text = ttk.Entry(self.p2).grid(row =1 , column = 0)
-        
+
         self.ExpenseTable = ttk.Treeview(self.p2,columns = self.columns)
         self.ExpenseTable.heading("1", text = "Type 1")
         self.ExpenseTable.heading("2", text = "Type 2")
         self.ExpenseTable.heading("3", text = "Type 3")
 
         self.ExpenseTable.grid(row = 2,column = 0, sticky = 'nsew')
-        self.PieChartIncome.grid(row = 2, column = 1) 
+        self.PieChartIncome.grid(row = 2, column = 1)
 
         #####Page 3#####
         self.PieChartExpenses = ttk.Frame(self.p3)
@@ -85,10 +85,10 @@ class MainGui:
         self.PieChartIncome.grid(row = 2, column = 1)
 
         #####Page 4#####
-        self.TimeChart = ttk.Frame(self.p4) 
+        self.TimeChart = ttk.Frame(self.p4)
         ttk.Label(self.p4, text = "Accounts Over Time").grid(row = 0, column = 0)
         ttk.Button(self.p4, text = "Record Current Values").grid(row = 0, column = 1)
-        
+
         self.AccountTable = ttk.Treeview(self.p4,columns = self.columns)
 
         self.AccountTable.heading("1", text = "Type 1")
@@ -114,11 +114,11 @@ class MainGui:
         ttk.Label(self.p7, text = "Records: ").grid(row = 0, column = 0, sticky = 'w')
         self.RecordSheet = tk.Text(self.p7)
 
-        
+
         self.RecordSheet.grid(row = 1, column = 0)
         #.grid all items to make them real
         self.frame.grid()
-        
+
 
     #####New Window Functions#####
     def New_Profile(self): #CHECK#
@@ -163,7 +163,7 @@ class MainGui:
 
     def BKDelIncExp(self,name):
         self.Profile.New_IncExp_Catagory(name,Type,Color)
-        print("Catagory Deleted")    
+        print("Catagory Deleted")
 
     def BKNew_Acc(self,name,Type,Color):
         self.Profile.New_Account(name,Type,Color)
@@ -183,11 +183,11 @@ class MainGui:
     def BKRecAcc(self):
         print("Bruh")
 
-           
+
     def test(self):
         print(self.Profile.accounts)
 
-        
+
 
 def main():
     root = tk.Tk()
