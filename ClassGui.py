@@ -22,20 +22,17 @@ class MainGui:
         self.p5 = ttk.Frame(self.frame)
         self.p6 = ttk.Frame(self.frame)
         self.p7 = ttk.Frame(self.frame)
+        self.p8 = ttk.Frame(self.frame)
+        self.p9 = ttk.Frame(self.frame)
         self.frame.add(self.p1, text = "Overview")
         self.frame.add(self.p2, text = "Income")
         self.frame.add(self.p3, text = "Expenses")
-        self.frame.add(self.p4, text = "Accounts Over Time")
-        self.frame.add(self.p5, text = "Graphs")
-        self.frame.add(self.p6, text = "Reccuring Transactions")
-        self.frame.add(self.p7, text = "Records")
-
-        #Test Values
-        self.columns = ["1","2","3","4"]
-        self.Expenses = ["Expense A","Expense B","Expense C"]
-        self.Incomes = ["Income A", "Income B", "Income C"]
-
-
+        self.frame.add(self.p4, text = "Groupings")
+        self.frame.add(self.p5, text = "Vacations")
+        self.frame.add(self.p6, text = "Accounts Over Time")
+        self.frame.add(self.p7, text = "Graphs")
+        self.frame.add(self.p8, text = "Reccuring Transactions")
+        self.frame.add(self.p9, text = "Records")
 
         #####Page 1#####
         ttk.Label(self.p1, text = "Account Overview").grid(column = 0, row = 0, sticky = 'w')
@@ -57,32 +54,18 @@ class MainGui:
 
 
         #####Page 2#####
-
         self.PieChartIncome = ttk.Frame(self.p2)
-        ttk.Label(self.p2, text = "Income").grid(row = 0, column = 0, sticky = 'w')
-        ttk.Button(self.p2, text = "New Entry",command = self.New_IncExp).grid(row = 0, column = 1)
-        text = ttk.Entry(self.p2).grid(row =1 , column = 0)
 
-        self.ExpenseTable = ttk.Treeview(self.p2,columns = self.columns)
-        self.ExpenseTable.heading("1", text = "Type 1")
-        self.ExpenseTable.heading("2", text = "Type 2")
-        self.ExpenseTable.heading("3", text = "Type 3")
-
-        self.ExpenseTable.grid(row = 2,column = 0, sticky = 'nsew')
-        self.PieChartIncome.grid(row = 2, column = 1)
+        IncomeTable = ui.IncExpGrid(self.p2,"Income",self.Profile.incexpcat,self.New_IncExp,self.Del_IncExp,self.BKRecIncExp)
+        IncomeTable.IEGrid.grid(row = 0,column = 0, sticky = 'nsew')
+        self.PieChartIncome.grid(row = 0, column = 1)
 
         #####Page 3#####
         self.PieChartExpenses = ttk.Frame(self.p3)
-        ttk.Label(self.p3, text = "Expenses").grid(row = 0, column = 0,sticky = 'w')
-        ttk.Button(self.p3, text = "New Entry",command = self.New_IncExp).grid(row = 0, column = 1)
 
-        self.IncomeTable = ttk.Treeview(self.p3,columns = self.columns)
-        self.IncomeTable.heading("1", text = "Type 1")
-        self.IncomeTable.heading("2", text = "Type 2")
-        self.IncomeTable.heading("3", text = "Type 3")
-
-        self.IncomeTable.grid(row = 1,column = 0, sticky = 'nse')
-        self.PieChartIncome.grid(row = 2, column = 1)
+        ExpenseTable = ui.IncExpGrid(self.p3,"Expense",self.Profile.incexpcat,self.New_IncExp,self.Del_IncExp,self.BKRecIncExp)
+        ExpenseTable.IEGrid.grid(row = 0,column = 0, sticky = 'nsew')
+        self.PieChartExpenses.grid(row = 0, column = 1)
 
         #####Page 4#####
         self.TimeChart = ttk.Frame(self.p4)
@@ -149,7 +132,7 @@ class MainGui:
     def Del_IncExp(self):
         self.NewWindow = tk.Toplevel(self.master)
         self.NewWindow.title("New Income")
-        self.app = win.WinNewIncome(self.NewWindow)
+        self.app = win.WinDelIncExp(self.NewWindow)
 
     #####PassBack Functions#####
 
@@ -160,28 +143,45 @@ class MainGui:
     def BKNewIncExp(self,name,Type,Color):
         self.Profile.New_IncExp_Catagory(name,Type,Color)
         print("New Catagory Created")
+        IncomeTable.IEGrid.destroy()
+        ExpenseTable.IEGrid.destroy()
+        IncomeTable = ui.IncExpGrid(self.p2,"Income",self.Profile.incexpcat,self.New_IncExp,self.Del_IncExp,self.BKRecIncExp)
+        IncomeTable.IEGrid.grid(row = 0,column = 0, sticky = 'nsew')
+        ExpenseTable = ui.IncExpGrid(self.p3,"Expense",self.Profile.incexpcat,self.New_IncExp,self.Del_IncExp,self.BKRecIncExp)
+        ExpenseTable.IEGrid.grid(row = 0,column = 0, sticky = 'nsew')
 
     def BKDelIncExp(self,name):
-        self.Profile.New_IncExp_Catagory(name,Type,Color)
+        self.Profile.Del_IncExp_Catagory(name)
         print("Catagory Deleted")
+        IncomeTable.IEGrid.destroy()
+        ExpenseTable.IEGrid.destroy()
+        IncomeTable = ui.IncExpGrid(self.p2,"Income",self.Profile.incexpcat,self.New_IncExp,self.Del_IncExp,self.BKRecIncExp)
+        IncomeTable.IEGrid.grid(row = 0,column = 0, sticky = 'nsew')
+        ExpenseTable = ui.IncExpGrid(self.p3,"Expense",self.Profile.incexpcat,self.New_IncExp,self.Del_IncExp,self.BKRecIncExp)
+        ExpenseTable.IEGrid.grid(row = 0,column = 0, sticky = 'nsew')
+
+    def BKRecIncExp(self):
+        print("HI")
 
     def BKNew_Acc(self,name,Type,Color):
         self.Profile.New_Account(name,Type,Color)
         print("New Account created")
+        ACCLIST.Acc.destroy()
         ACCLIST = ui.AccountList(self.p1,self.Profile.accounts,self.New_Account,self.Del_Account,self.BKRecAcc)
         ACCLIST.Acc.grid(column = 2, row = 4, rowspan = 2)
 
     def BKDel_Acc(self,name):
         self.Profile.Delete_Account(name)
         print(" Account deleted")
+        ACCLIST.Acc.destroy()
         ACCLIST = ui.AccountList(self.p1,self.Profile.accounts,self.New_Account,self.Del_Account)
         ACCLIST.Acc.grid(column = 2, row = 4, rowspan = 2)
 
-    def BKSave(self):
-        self.Profile.Save_Profile(self.Profile.directory)
-
     def BKRecAcc(self):
         print("Bruh")
+
+    def BKSave(self):
+        self.Profile.Save_Profile(self.Profile.directory)
 
 
     def test(self):

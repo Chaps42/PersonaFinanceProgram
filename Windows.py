@@ -43,9 +43,7 @@ class WinNewProfile:
             
         if self.Password.get() != self.PasswordConfirm.get():
             ttk.Label(self.t,text = "Passwords do not match", foreground='red').grid(row = 6,column = 1)
-            
-
-    
+             
 class WinLoadProfile:
     def __init__(self,master,update):
         self.master = master
@@ -58,14 +56,13 @@ class WinLoadProfile:
         ttk.Button(self.t, text = "Continue", command = self.Load_Profile).grid(row = 0, column =  2)
         self.t.grid()
 
-
 class WinNewAccount:
     def __init__(self,master,func):
         self.master = master
         self.func = func
 
         self.Name = tk.StringVar()
-        self.Color = tk.StringVar()
+        self.Color = tk.StringVar(value = '#ff00ff')
         self.Type = tk.StringVar(value = 'Asset')
 
         self.values = {"RadioButton 1":'Asset', "RadioButton 2":'Debt'}
@@ -108,8 +105,8 @@ class WinNewIncExp:
         self.newinc = newinc
 
         self.Name = tk.StringVar()
-        self.Color = tk.StringVar()
-        self.Type = tk.StringVar(value = 'Asset')
+        self.Color = tk.StringVar(value = '#ff00ff')
+        self.Type = tk.StringVar(value = 'Income')
 
         self.values = {"RadioButton 1":'Income', "RadioButton 2":'Expense'}
         
@@ -118,10 +115,10 @@ class WinNewIncExp:
 
         self.AType = tk.StringVar(self.master,"Credit")
         ttk.Label(self.t, text = "Type:").grid(row = 1, column = 0)
-        ttk.Radiobutton(self.t,text = "Income", variable = self.Type, value = "Asset").grid(row = 1, column = 1)
-        ttk.Radiobutton(self.t,text = "Expense", variable = self.Type, value = "Debt").grid(row = 1, column = 2)
+        ttk.Radiobutton(self.t,text = "Income", variable = self.Type, value = "Income").grid(row = 1, column = 1)
+        ttk.Radiobutton(self.t,text = "Expense", variable = self.Type, value = "Expense").grid(row = 1, column = 2)
         ttk.Label(self.t, text = "Color").grid(row = 3, column = 0)
-        ttk.Button(self.t,command = lambda: colorchooser.askcolor(initialcolor=clr)).grid(row = 3, column = 1,columnspan = 2)
+        ttk.Button(self.t,command = self.ColorChose).grid(row = 3, column = 1,columnspan = 2)
         
         
         ttk.Button(self.t, text = "Continue", command = self.New_Catagory).grid(row = 4, column =  2)
@@ -129,7 +126,29 @@ class WinNewIncExp:
         
         self.t.grid()
 
+    def ColorChose():
+        colorchooser.askcolor(initialcolor=clr)
+
+
     def New_Catagory(self):
         self.newinc(self.Name.get(),self.Type.get(),self.Color.get())
         self.master.destroy()
 
+class WinDelIncExp:
+    def __init__(self,master,incexp,delfunction):
+        self.master = master
+        self.t = ttk.Frame(self.master)
+
+        self.Name = tk.StringVar()
+        
+        ttk.Label(self.t, text = "Delete Catagory").grid(row = 0, column = 0)
+        ttk.Combobox(self.t,textvariable = self.Name).grid(row = 0, column = 1,columnspan = 2)
+        
+        ttk.Button(self.t, text = "Continue", command = self.New_Catagory).grid(row = 4, column =  2)
+        ttk.Button(self.t, text = "Cancel", command = self.master.destroy).grid(row = 4, column = 1)
+        
+        self.t.grid()
+
+    def Del_IncExp(self):
+        delfunction()
+        self.master.destroy()
