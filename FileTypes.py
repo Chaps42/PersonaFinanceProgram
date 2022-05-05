@@ -17,7 +17,7 @@ class Profile:
         self.records = ''
 
     def New_Account(self,name,Type,color):
-        self.accounts[name] = Account(name,Type,color,self.Acc_Date_Add)
+        self.accounts[name] = Account(name,Type,color)
 
     def Delete_Account(self,name):
         del self.accounts[name]
@@ -49,68 +49,71 @@ class Profile:
     def Del_Vacation(self,name):
         del self.vacations[name]
 
-
     def Save_Profile(self,directory):
         directory = directory + "/Profile" + self.name + ".txt"
         f = open(directory,'w')
-        f.write(self.name)
-        f.write(self.password)
+        f.write(self.name + "\n")
+        f.write(self.password+ "\n")
 
-        f.write("ACCOUNTS")
+        f.write("ACCOUNTS\n")
         AKeys = list(self.accounts.keys())
-        f.write(str(len(AKeys)))
+        f.write(str(len(AKeys))+ "\n")
         for i in AKeys:
             temp1 = self.accounts[i]
             A = temp1.values
             B = list(A.keys())
-            f.write(temp1.name + ',' + temp1.type+','+temp1.color + ','+ str(len(B)))
+            f.write(temp1.name + ',' + temp1.type+','+temp1.color + ','+ str(len(B))+ "\n")
             for j in B:
-                f.write(B+','+A[B])
+                f.write(str(j)+','+str(A[j])+ "\n")
 
-        f.write("INCOME/EXPENSES")
+        f.write("INCOME/EXPENSES"+ "\n")
         IECKeys = list(self.incexpcat.keys())
-        f.write(str(len(IECKeys)))
+        f.write(str(len(IECKeys))+ "\n")
         for i in IECKeys:
             temp1 = self.incexpcat[i]
             A = temp1.values
             B = list(A.keys())
-            f.write(temp1.name + ',' + temp1.type+','+temp1.color+ ','+ str(len(B)))
+            f.write(temp1.name + ',' + temp1.type+','+temp1.color+ ','+ str(len(B))+ "\n")
             for j in B:
-                f.write(B+','+A[B])
+                f.write(str(j)+','+str(A[j])+ "\n")
 
-        f.write("RECURRING")
+        f.write("RECURRING"+ "\n")
         RECKeys = list(self.reccuring.keys())
-        f.write(str(len(RECKeys)))
+        f.write(str(len(RECKeys))+ "\n")
         for i in RECKeys:
             temp1 = self.reccuring[i]
-            f.write(temp1.name + ',' + temp1.value+','+temp1.type +','+temp1.startdate)
+            f.write(temp1.name + ',' + temp1.value+','+temp1.type +','+temp1.startdate+ "\n")
 
-        f.write("GROUPINGS")
+        f.write("GROUPINGS"+ "\n")
         GKeys = list(self.groupings.keys())
-        f.write(len(GKeys))
+        f.write(str(len(GKeys))+ "\n")
         for i in GKeys:
             temp1 = self.groupings[i]
-            f.write(temp1.name + ',' +str(len(temp1.cats)))
-            for i in temp1.cats:
-                f.write(i)
+            f.write(temp1.name + ',' +str(len(temp1.cats))+ "\n")
+            for j in temp1.cats:
+                f.write(str(j)+ "\n")
 
-        f.write("VACATIONCATS")
-        f.write(self.vaccats.catnames)
+        f.write("VACATIONCATS"+ "\n")
+        string = ''
+        for i in self.vaccats.catnames:
+            string += str(i) + ','
+        string = string[0:-1]
+        f.write(string+ "\n")
 
-        f.write("VACATIONS")
+        f.write("VACATIONS"+ "\n")
         VacKeys = list(self.vacations.keys())
-        f.write(str(len(VacKeys)))
+        f.write(str(len(VacKeys))+ "\n")
         for i in VacKeys:
             temp1 = self.vacations[i]
-            f.write(temp1.name + ',' + temp1.date+','+str(len(temp1.catlist)))
-            f.write(temp1.catlist)
+            f.write(temp1.name + ',' + temp1.date+','+str(len(temp1.catlist))+ "\n")
+            f.write(temp1.catlist+ "\n")
             for j in list(temp1.values.keys()):
-                f.write(j+','+temp1.values[j])
+                f.write(str(j)+','+str(temp1.values[j])+ "\n")
 
-        f.write("RECORDS")
-        f.write(self.records)
-        f.write("ENDOFRECORDS")
-        f.write("ENDOFFILE")
+        f.write("RECORDS"+ "\n")
+        f.write(self.records+ "\n")
+        f.write("ENDOFRECORDS"+ "\n")
+        f.write("ENDOFFILE"+ "\n")
         f.close()
 
     def Load_Profile(self,directory,password):
@@ -237,12 +240,16 @@ class Account:
         self.values = {}
         self.type = Type
         self.color = Color
+        self.dates = []
 
     def New_Value(self,date,value):
         self.values[date] = value
+        if date not in self.dates:
+            self.dates.append(date)
 
     def Delete_Value(self,date):
         del self.values[date]
+        self.dates.remove(date)
  
 class IncExpCatagory:
     def __init__(self,name,Type,color):
@@ -250,12 +257,16 @@ class IncExpCatagory:
         self.values = {}
         self.color = color
         self.type = Type
+        self.dates = []
 
     def New_Value(self,date,value):
         self.values[date] = value
+        if date not in self.dates:
+            self.dates.append(date)
 
     def Delete_Value(self,date):
         del self.values[date]
+        self.dates.remove(date)
             
 class RecurringTransaction:
 

@@ -56,6 +56,9 @@ class WinLoadProfile:
         ttk.Button(self.t, text = "Continue", command = self.Load_Profile).grid(row = 0, column =  2)
         self.t.grid()
 
+    def Load_Profile(self):
+        update
+
 class WinNewAccount:
     def __init__(self,master,func):
         self.master = master
@@ -87,26 +90,31 @@ class WinDelAccount:
         self.func = function
         self.list = list(accounts.keys())
 
+        self.n = tk.StringVar()
+
         self.t = ttk.Frame(self.master)
         ttk.Label(self.t, text = "Choose an Account to Delete:").grid(row = 0, column = 0,columnspan = 2)
-        #insert menu pull down here
+        Menu = ttk.Combobox(self.t,textvariable = self.n)
+        Menu['values'] = self.list
+        Menu.current()
         ttk.Button(self.t, text = "Continue", command = self.Del_Account).grid(row = 2, column =  1)
         ttk.Button(self.t, text = "Cancel", command = self.master.destroy).grid(row = 2, column = 0)
+        Menu.grid(row = 1, column = 0, columnspan = 2)
         self.t.grid()
         
     def Del_Account(self):
-        print("Deleted Account")
+        self.func(self.n.get())
         self.master.destroy()
 
 class WinNewIncExp:
-    def __init__(self,master,newinc):
+    def __init__(self,master,newinc,Type):
         self.master = master
         self.t = ttk.Frame(self.master)
         self.newinc = newinc
 
         self.Name = tk.StringVar()
         self.Color = tk.StringVar(value = '#ff00ff')
-        self.Type = tk.StringVar(value = 'Income')
+        self.Type = tk.StringVar(value = Type)
 
         self.values = {"RadioButton 1":'Income', "RadioButton 2":'Expense'}
         
@@ -138,17 +146,22 @@ class WinDelIncExp:
     def __init__(self,master,incexp,delfunction):
         self.master = master
         self.t = ttk.Frame(self.master)
+        self.func = delfunction
+        self.list = list(incexp.keys())
 
         self.Name = tk.StringVar()
         
         ttk.Label(self.t, text = "Delete Catagory").grid(row = 0, column = 0)
-        ttk.Combobox(self.t,textvariable = self.Name).grid(row = 0, column = 1,columnspan = 2)
+        Menu = ttk.Combobox(self.t,textvariable = self.Name)
+        Menu['values'] = self.list
+        Menu.current()
         
-        ttk.Button(self.t, text = "Continue", command = self.New_Catagory).grid(row = 4, column =  2)
+        Menu.grid(row = 0, column = 1,columnspan = 2)
+        ttk.Button(self.t, text = "Continue", command = self.Del_IncExp).grid(row = 4, column =  2)
         ttk.Button(self.t, text = "Cancel", command = self.master.destroy).grid(row = 4, column = 1)
         
         self.t.grid()
 
     def Del_IncExp(self):
-        delfunction()
+        self.func(self.Name.get())
         self.master.destroy()

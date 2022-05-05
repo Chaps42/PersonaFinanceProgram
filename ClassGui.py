@@ -1,7 +1,9 @@
 import tkinter as tk
+import datetime as dt
 from tkinter import ttk
 from tkinter import filedialog
 from tkinter import colorchooser
+
 
 import FileTypes as ft
 import Windows as win
@@ -36,35 +38,35 @@ class MainGui:
 
         #####Page 1#####
         ttk.Label(self.p1, text = "Account Overview").grid(column = 0, row = 0, sticky = 'w')
-        ttk.Label(self.p1, text = "Current Profile: "+self.Profile.name).grid(column = 1, row = 0, sticky = 'w')
-        ttk.Button(self.p1, text = "New Profile",command = self.New_Profile).grid(column = 0, row = 1)
-        ttk.Button(self.p1, text = "Load Profile",command = self.Load_Profile).grid(column = 0, row = 2)
-        ttk.Button(self.p1, text = "Save",command = self.BKSave).grid(column = 5, row = 5)
+        ttk.Label(self.p1, text = "Current Profile: "+self.Profile.name).grid(column = 0, row = 1, sticky = 'w')
+        ttk.Button(self.p1, text = "New Profile",command = self.New_Profile).grid(column = 0, row = 2)
+        ttk.Button(self.p1, text = "Load Profile",command = self.Load_Profile).grid(column = 0, row = 3)
+        ttk.Button(self.p1, text = "Save",command = self.BKSave).grid(column = 1, row = 2)
         self.Utilization = ttk.Frame(self.p1)
         self.ExpChart = ttk.Frame(self.p1)
 
-        self.Acc = ttk.Button(self.p1, text = "Test",command = self.test).grid(column = 5, row = 6)
+        self.Acc = ttk.Button(self.p1, text = "Test",command = self.test).grid(column = 1, row = 3)
 
         #Initialize account list here
-        ACCLIST = ui.AccountList(self.p1,self.Profile.accounts,self.New_Account,self.Del_Account,self.BKRecAcc)
+        self.ACCLIST = ui.AccountList(self.p1,self.Profile.accounts,self.New_Account,self.Del_Account,self.BKRecAcc,dt.date.today())
 
         self.Utilization.grid(column = 0, row = 4, rowspan = 2)
-        ACCLIST.Acc.grid(column = 2, row = 4, rowspan = 2)
+        self.ACCLIST.Acc.grid(column = 2, row = 4, rowspan = 2)
         self.ExpChart.grid(column = 4, row = 4, rowspan = 2)
 
 
         #####Page 2#####
         self.PieChartIncome = ttk.Frame(self.p2)
 
-        IncomeTable = ui.IncExpGrid(self.p2,"Income",self.Profile.incexpcat,self.New_IncExp,self.Del_IncExp,self.BKRecIncExp)
-        IncomeTable.IEGrid.grid(row = 0,column = 0, sticky = 'nsew')
+        self.IncomeTable = ui.IncExpGrid(self.p2,"Income",self.Profile.incexpcat,self.New_IncExp,self.Del_IncExp,self.BKRecIncExp,dt.date.today(),self.BKNewDateIncExp)
+        self.IncomeTable.IEGrid.grid(row = 0,column = 0, sticky = 'nsew')
         self.PieChartIncome.grid(row = 0, column = 1)
 
         #####Page 3#####
         self.PieChartExpenses = ttk.Frame(self.p3)
 
-        ExpenseTable = ui.IncExpGrid(self.p3,"Expense",self.Profile.incexpcat,self.New_IncExp,self.Del_IncExp,self.BKRecIncExp)
-        ExpenseTable.IEGrid.grid(row = 0,column = 0, sticky = 'nsew')
+        self.ExpenseTable = ui.IncExpGrid(self.p3,"Expense",self.Profile.incexpcat,self.New_IncExp,self.Del_IncExp,self.BKRecIncExp,dt.date.today(),self.BKNewDateIncExp)
+        self.ExpenseTable.IEGrid.grid(row = 0,column = 0, sticky = 'nsew')
         self.PieChartExpenses.grid(row = 0, column = 1)
 
         #####Page 4#####
@@ -72,13 +74,6 @@ class MainGui:
         ttk.Label(self.p4, text = "Accounts Over Time").grid(row = 0, column = 0)
         ttk.Button(self.p4, text = "Record Current Values").grid(row = 0, column = 1)
 
-        self.AccountTable = ttk.Treeview(self.p4,columns = self.columns)
-
-        self.AccountTable.heading("1", text = "Type 1")
-        self.AccountTable.heading("2", text = "Type 2")
-        self.AccountTable.heading("3", text = "Type 3")
-
-        self.AccountTable.grid(row = 1,column = 0, sticky = 'nse')
         self.TimeChart.grid(row = 1, column = 1)
 
         #####Page 5#####
@@ -124,68 +119,86 @@ class MainGui:
         self.NewWindow.title("New Account Details")
         self.app = win.WinDelAccount(self.NewWindow,self.Profile.accounts,self.BKDel_Acc)
 
-    def New_IncExp(self):
+    def New_IncExp(self,Type):
         self.NewWindow = tk.Toplevel(self.master)
         self.NewWindow.title("New Income/Expense")
-        self.app = win.WinNewIncExp(self.NewWindow,self.BKNewIncExp)
+        self.app = win.WinNewIncExp(self.NewWindow,self.BKNewIncExp,Type)
 
     def Del_IncExp(self):
         self.NewWindow = tk.Toplevel(self.master)
         self.NewWindow.title("New Income")
-        self.app = win.WinDelIncExp(self.NewWindow)
+        self.app = win.WinDelIncExp(self.NewWindow,self.Profile.incexpcat,self.BKDel_IncExp)
 
     #####PassBack Functions#####
 
     def BKOverwrite_Profile(self,NewProfile):
         self.Profile = NewProfile
-        print("New Profile Created")
+        self.UpdateAll()
 
     def BKNewIncExp(self,name,Type,Color):
         self.Profile.New_IncExp_Catagory(name,Type,Color)
-        print("New Catagory Created")
-        IncomeTable.IEGrid.destroy()
-        ExpenseTable.IEGrid.destroy()
-        IncomeTable = ui.IncExpGrid(self.p2,"Income",self.Profile.incexpcat,self.New_IncExp,self.Del_IncExp,self.BKRecIncExp)
-        IncomeTable.IEGrid.grid(row = 0,column = 0, sticky = 'nsew')
-        ExpenseTable = ui.IncExpGrid(self.p3,"Expense",self.Profile.incexpcat,self.New_IncExp,self.Del_IncExp,self.BKRecIncExp)
-        ExpenseTable.IEGrid.grid(row = 0,column = 0, sticky = 'nsew')
+        self.UpdateExpense()
+        self.UpdateIncome()
 
-    def BKDelIncExp(self,name):
+    def BKDel_IncExp(self,name):
         self.Profile.Del_IncExp_Catagory(name)
-        print("Catagory Deleted")
-        IncomeTable.IEGrid.destroy()
-        ExpenseTable.IEGrid.destroy()
-        IncomeTable = ui.IncExpGrid(self.p2,"Income",self.Profile.incexpcat,self.New_IncExp,self.Del_IncExp,self.BKRecIncExp)
-        IncomeTable.IEGrid.grid(row = 0,column = 0, sticky = 'nsew')
-        ExpenseTable = ui.IncExpGrid(self.p3,"Expense",self.Profile.incexpcat,self.New_IncExp,self.Del_IncExp,self.BKRecIncExp)
-        ExpenseTable.IEGrid.grid(row = 0,column = 0, sticky = 'nsew')
+        self.UpdateExpense()
+        self.UpdateIncome()
 
-    def BKRecIncExp(self):
-        print("HI")
+    def BKNewDateIncExp(self,Type,date):
+        List = list(self.Profile.incexpcat.keys())
+        for i in List:
+            if self.Profile.incexpcat[i].type == Type:
+                self.Profile.incexpcat[i].New_Value(date,0)
+        self.UpdateExpense()
+        self.UpdateIncome()
+
+    def BKRecIncExp(self,cat,date,value):
+        self.Profile.incexpcat[cat].New_Value(date,value)
+        self.UpdateExpense()
+        self.UpdateIncome()
 
     def BKNew_Acc(self,name,Type,Color):
         self.Profile.New_Account(name,Type,Color)
-        print("New Account created")
-        ACCLIST.Acc.destroy()
-        ACCLIST = ui.AccountList(self.p1,self.Profile.accounts,self.New_Account,self.Del_Account,self.BKRecAcc)
-        ACCLIST.Acc.grid(column = 2, row = 4, rowspan = 2)
+        self.UpdateAcc()
 
     def BKDel_Acc(self,name):
         self.Profile.Delete_Account(name)
-        print(" Account deleted")
-        ACCLIST.Acc.destroy()
-        ACCLIST = ui.AccountList(self.p1,self.Profile.accounts,self.New_Account,self.Del_Account)
-        ACCLIST.Acc.grid(column = 2, row = 4, rowspan = 2)
+        self.UpdateAcc()
 
-    def BKRecAcc(self):
-        print("Bruh")
+    def BKRecAcc(self,Account,Date,Value):
+        self.Profile.accounts[Account].New_Value(Date,Value)
 
     def BKSave(self):
         self.Profile.Save_Profile(self.Profile.directory)
 
-
     def test(self):
         print(self.Profile.accounts)
+
+
+    ### UI Refresher Functions
+    def UpdateAcc(self):
+        predate = self.ACCLIST.date.get()
+        self.ACCLIST.Acc.destroy()
+        self.ACCLIST = ui.AccountList(self.p1,self.Profile.accounts,self.New_Account,self.Del_Account,self.BKRecAcc, predate)
+        self.ACCLIST.Acc.grid(column = 2, row = 4, rowspan = 2)
+
+    def UpdateIncome(self):
+        ID = self.IncomeTable.date.get()
+        self.IncomeTable.IEGrid.destroy()
+        self.IncomeTable = ui.IncExpGrid(self.p2,"Income",self.Profile.incexpcat,self.New_IncExp,self.Del_IncExp,self.BKRecIncExp,ID,self.BKNewDateIncExp)
+        self.IncomeTable.IEGrid.grid(row = 0,column = 0, sticky = 'nsew')
+
+    def UpdateExpense(self):
+        ED = self.ExpenseTable.date.get()
+        self.ExpenseTable.IEGrid.destroy()
+        self.ExpenseTable = ui.IncExpGrid(self.p3,"Expense",self.Profile.incexpcat,self.New_IncExp,self.Del_IncExp,self.BKRecIncExp,ED,self.BKNewDateIncExp)
+        self.ExpenseTable.IEGrid.grid(row = 0,column = 0, sticky = 'nsew')
+
+    def UpdateAll(self):
+        self.UpdateAcc()
+        self.UpdateExpense()
+        self.UpdateIncome()
 
 
 
