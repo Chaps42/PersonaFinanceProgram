@@ -119,119 +119,115 @@ class Profile:
     def Load_Profile(self,directory,password):
         f = open(directory,'r')
 
-        tempname = f.readline()
-        temppass = f.readline()
+        tempname = self.ReadNoLine(f)
+        temppass = self.ReadNoLine(f)
         if temppass == password:
             self.name = tempname
             self.password = temppass
-            
-            while i <= len(f):
-                A = f.readline()
-                if A == "ACCOUNTS":
-                    Acnum = int(f.readline())
-                    k = 0
-                    while k < Acnum:
-                        B = f.readline().split(',')
-                        num = B[-1]
-                        self.New_Account(B[0],B[1],B[2])
-                        l = 0
-                        while l < num:
-                            C = f.readline().split(',')
-                            self.accounts[B[0]].New_Value(C[0],C[1])
-                            l += 1
-                        k+=1
+            m = 0
+            count = 0
 
-                if A == "INCOME/EXPENSES":
-                    IECNum = int(f.readline())
-                    k = 0
-                    while k < IECNum:
-                        B = f.readline().split(',')
-                        num = B[-1]
-                        self.New_IncExp_Catagory(B[0],B[1],B[2])
-                        l = 0
-                        while l < num:
-                            C = f.readline().split(',')
-                            self.incexpcat[B[0]].New_Value(C[0],C[1])
-                            l += 1
-                        k+=1
+            while m == 0:
+                count += 1
+                A = self.ReadNoLine(f)
+                if A is not None:
+                    if A == "ACCOUNTS":
+                        Acnum = int(self.ReadNoLine(f))
+                        k = 0
+                        while k < Acnum:
+                            B = self.ReadNoLine(f).split(',')
+                            num = int(B[-1])
+                            self.New_Account(B[0],B[1],B[2])
+                            l = 0
+                            while l < num:
+                                C = self.ReadNoLine(f).split(',')
+                                self.accounts[B[0]].New_Value(C[0],C[1])
+                                l += 1
+                            k+=1
 
-                if A == "RECURRING":
-                    RECnum = f.readline()
-                    k = 0
-                    while k < RECnum:
-                        A = f.readline().split(',')
-                        self.New_Recurring(A[0],A[1],A[2],A[3])
-                        k+= 1
+                    if A == "INCOME/EXPENSES":
+                        IECNum = int(self.ReadNoLine(f))
+                        k = 0
+                        while k < IECNum:
+                            B = self.ReadNoLine(f).split(',')
+                            num = int(B[-1])
+                            self.New_IncExp_Catagory(B[0],B[1],B[2])
+                            l = 0
+                            while l < num:
+                                C = f.readline().split(',')
+                                self.incexpcat[B[0]].New_Value(C[0],C[1])
+                                l += 1
+                            k+=1
 
-                if A == "GROUPINGS":
-                    Gnum = int(f.readline())
-                    k = 0
-                    while k < Gnum:
-                        A = f.readline().split(',')
-                        l = 0
-                        B = []
-                        while l < A[-1]:
-                            B.append(f.readline())
-                            l+= 1
-                        self.New_Group(A[0],B)
-                        k+= 1
+                    if A == "RECURRING":
+                        RECnum = int(self.ReadNoLine(f))
+                        k = 0
+                        while k < RECnum:
+                            A = f.readline().split(',')
+                            self.New_Recurring(A[0],A[1],A[2],A[3])
+                            k+= 1
 
-
-                if A == "VACATIONCATS":
-                    C = f.readline()[1:-1]
-                    E = C.split(',')
-                    B = []
-                    for k in E:
-                        self.vaccats.catnames.append(k) 
+                    if A == "GROUPINGS":
+                        Gnum = int(self.ReadNoLine(f))
+                        k = 0
+                        while k < Gnum:
+                            A = f.readline().split(',')
+                            l = 0
+                            B = []
+                            while l < A[-1]:
+                                B.append(f.readline())
+                                l+= 1
+                            self.New_Group(A[0],B)
+                            k+= 1
 
 
-                if A == "VACATIONS":
-                    Vnum = f.readline()
-                    k = 0
-                    while k < Vnum:
-                        B = f.readline().split(',')
-                        C = f.readline()[1:-1]
+                    if A == "VACATIONCATS":
+                        C = self.ReadNoLine(f)
                         E = C.split(',')
-                        self.New_Vacation(B[0],B[1],E)
-                        l = 0
-                        while l < B[-1]:
-                            G = f.readline()
-                            self.vacations[B[0]].values[G[0]] = G[1]
-                            l+=1
-                        k+=1
+                        B = []
+                        for k in E:
+                            self.vaccats.catnames.append(k) 
+
+
+                    if A == "VACATIONS":
+                        Vnum = int(self.ReadNoLine(f))
+                        k = 0
+                        while k < Vnum:
+                            B = f.readline().split(',')
+                            C = f.readline()[1:-1]
+                            E = C.split(',')
+                            self.New_Vacation(B[0],B[1],E)
+                            l = 0
+                            while l < B[-1]:
+                                G = f.readline()
+                                self.vacations[B[0]].values[G[0]] = G[1]
+                                l+=1
+                            k+=1
 
 
 
-                if A == "RECORDS":
-                    i = 0
-                    while i == 0:
-                        if f.readline() == "ENDOFRECORDS":
-                            i = 1
-                            continue
-                        else:
-                            self.records += f.readline()
+                    if A == "RECORDS":
+                        i = 0
+                        while i == 0:
+                            N = self.ReadNoLine(f)
+                            if N == "ENDOFRECORDS":
+                                i = 1
+                                continue
+                            else:
+                                self.records += N + "\n"
 
+                    if A == "ENDOFFILE":
+                        f.close()
+                        m = 2
+                if A is None:
+                    m = 2
+        else:
+            print("Incorrect Password")
 
-                if A == "ENDOFFILE":
-                    f.close()
+            
+    def ReadNoLine(self,f):
+        return f.readline().replace("\n","")
 
-
-            f.write("VACATIONCATS")
-            f.write(self.vaccats.catnames)
-
-            f.write("VACATIONS")
-            VacKeys = list[self.vacations.keys()]
-            for i in VacKeys:
-                temp1 = self.vacations[i]
-                f.write(temp1.name + ',' + temp1.date)
-                f.write(temp1.catlist)
-                for j in list(temp1.values.keys()):
-                    f.write(j+','+temp1.values[j])
-
-            f.write("RECORDS")
-            f.write(self.records)
-            f.write("ENDOFFILE")
-            f.close()
         
 
 class Account:

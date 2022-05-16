@@ -1,10 +1,15 @@
 import tkinter as tk
 import datetime as dt
-from tkinter import ttk
+from tkinter import Variable, ttk
 from tkinter import filedialog
 from tkinter import colorchooser
-
+import
+from sys import platform as OS 
 import FileTypes as ft
+from matplotlib.figure import Figure as Fig
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, 
+NavigationToolbar2Tk)
+
 
 ##### UI Elements #####
 
@@ -74,7 +79,6 @@ class AccountList:
             Value = self.AccVars[i].get()
             self.RecCom(Account,InputDate,Value)
         
-
 class IncExpGrid:
     def __init__(self,master,Type,IncExps,NewCat,DeleteCat,RecordVal,prevdate,newrow):
         self.Cats = list(IncExps.keys())
@@ -176,8 +180,122 @@ class IncExpGrid:
                     value = self.GridVal[i][j].get()
                     self.RecIncExp(cat,date,value)
 
-'''class CircleGraph:
+class CircleGraph:
+    def __init__(self,master,Type,Profile,update):
+        self.master = master
+        self.Profile = Profile
+        self.Type = Type
+        self.Update = updateˆ
+        self.F = ttk.Frame(self.master)
 
+        if Type == "Overview":
+
+            CBox = ttk.Combobox(self.F,textvariable = self.Date,validatecommand=self.Update,validate='focusout')
+            CBox['values'] = self.DateList
+            CBox.current()        
+
+
+            fig = Fig(figsize = (5, 5),dpi = 100)
+            # adding the subplot
+            plot1 = fig.add_subplot(111)
+            plot1.plot(y)
+            # creating the Tkinter canvas
+            # containing the Matplotlib figure
+            canvas = FigureCanvasTkAgg(fig,master = self.F)  
+            canvas.draw()
+            canvas.get_tk_widget().pack() # placing the canvas on the Tkinter window
+            toolbar = NavigationToolbar2Tk(canvas,self.F)# creating the Matplotlib toolbar
+            toolbar.update()
+            canvas.get_tk_widget().pack()# placing the toolbar on the Tkinter window
+
+        if Type == "Expenses":
+
+        if Type == "Incomes":
+
+        if Type == "Savings":
+
+        if Type == "Grouping":
+
+        if Type == "Vacation":
+
+        if Type == "Graphs":
+
+
+
+
+
+class Utilization:
+    def __init__(self,master,IncExp,update,predate):
+        self.master = master
+        self.IncExp = IncExp
+        self.F = ttk.Frame(self.master)
+        self.Date = tk.StringVar()
+        self.DateList = []
+        self.Income = 0
+        self.Expenses = 0
+        self.Savings = 0
+        self.Update = update
+        self.Predate = predate
+
+        Income = 0
+        Expenses = 0
+        Savings = 0
+
+        ttk.Label(self.F,text = "Utilization").grid(row = 0, column = 0)
+        ttk.Label(self.F,text = "Date").grid(row = 1, column = 0)
+        ttk.Label(self.F,text = "Income: ").grid(row = 2, column = 0)
+        ttk.Label(self.F,text = "Savings: ").grid(row = 3, column = 0)
+        ttk.Label(self.F,text = "Expenses: ").grid(row = 4, column = 0)
+        ttk.Label(self.F,text = "Remaining Budget: ").grid(row = 5, column = 0)
+
+        Keys = list(IncExp.keys()) #Get Unique Dates and sort them with most recent first
+        for i in Keys:
+            for j in IncExp[i].dates:
+                if j not in self.DateList:
+                    self.DateList.append(j)
+        self.DateList.sort(reverse=True)
+
+        if self.DateList and predate == dt.date.today():
+            self.Date = tk.StringVar(value = max(self.DateList))
+        elif not self.DateList:
+            self.Date = tk.StringVar(value = self.Predate)
+        elif self.DateList and predate != dt.date.today():
+            self.Date = tk.StringVar(value = self.Predate)
+            
+        CBox = ttk.Combobox(self.F,textvariable = self.Date,validatecommand=self.Update,validate='focusout')
+        CBox['values'] = self.DateList
+        CBox.current()
+
+        
+        for i in Keys:
+            if IncExp[i].type == "Income":
+                try: Income += float(IncExp[i].values[self.Date.get()])
+                except KeyError: Income += 0
+            if IncExp[i].type == "Expense":
+                try: Expenses += float(IncExp[i].values[self.Date.get()])
+                except KeyError: Expenses += 0
+            if IncExp[i].type == "Savings":
+                try: Savings += float(IncExp[i].values[self.Date.get()])
+                except KeyError: Savings += 0
+
+
+        Total = Income - Expenses - Savings
+        self.Income = tk.StringVar(value = "$"+str(Income))
+        self.Expenses = tk.StringVar(value = "$"+str(Expenses))
+        self.Savings = tk.StringVar(value = "$"+str(Savings))
+        self.Total = tk.StringVar(value = "$"+str(Total))
+        
+        CBox.grid(row = 1, column = 1)
+        ttk.Entry(self.F,textvariable = self.Income).grid(row = 2, column = 1)
+        ttk.Entry(self.F,textvariable = self.Expenses).grid(row = 3, column = 1)
+        ttk.Entry(self.F,textvariable = self.Savings).grid(row = 4, column = 1)
+        ttk.Entry(self.F,textvariable = self.Total).grid(row = 5, column = 1)
+
+        
+        
+
+
+'''
 class Groupings:
 
 class Recurring:'''

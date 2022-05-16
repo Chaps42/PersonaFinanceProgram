@@ -5,6 +5,7 @@ from tkinter import filedialog
 from tkinter import colorchooser
 
 
+
 import FileTypes as ft
 import Windows as win
 import UIElements as ui
@@ -26,55 +27,57 @@ class MainGui:
         self.p7 = ttk.Frame(self.frame)
         self.p8 = ttk.Frame(self.frame)
         self.p9 = ttk.Frame(self.frame)
+        self.p10 = ttk.Frame(self.frame)
         self.frame.add(self.p1, text = "Overview")
         self.frame.add(self.p2, text = "Income")
         self.frame.add(self.p3, text = "Expenses")
-        self.frame.add(self.p4, text = "Groupings")
-        self.frame.add(self.p5, text = "Vacations")
-        self.frame.add(self.p6, text = "Accounts Over Time")
-        self.frame.add(self.p7, text = "Graphs")
-        self.frame.add(self.p8, text = "Reccuring Transactions")
-        self.frame.add(self.p9, text = "Records")
+        self.frame.add(self.p4, text = "Savings")
+        self.frame.add(self.p5, text = "Groupings")
+        self.frame.add(self.p6, text = "Vacations")
+        self.frame.add(self.p7, text = "Accounts Over Time")
+        self.frame.add(self.p8, text = "Graphs")
+        self.frame.add(self.p9, text = "Reccuring Transactions")
+        self.frame.add(self.p10, text = "Records")
 
-        #####Page 1#####
+        ##### Page 1: Overview #####
         ttk.Label(self.p1, text = "Account Overview").grid(column = 0, row = 0, sticky = 'w')
         ttk.Label(self.p1, text = "Current Profile: "+self.Profile.name).grid(column = 0, row = 1, sticky = 'w')
         ttk.Button(self.p1, text = "New Profile",command = self.New_Profile).grid(column = 0, row = 2)
         ttk.Button(self.p1, text = "Load Profile",command = self.Load_Profile).grid(column = 0, row = 3)
         ttk.Button(self.p1, text = "Save",command = self.BKSave).grid(column = 1, row = 2)
-        self.Utilization = ttk.Frame(self.p1)
-        self.ExpChart = ttk.Frame(self.p1)
+
 
         self.Acc = ttk.Button(self.p1, text = "Test",command = self.test).grid(column = 1, row = 3)
 
-        #Initialize account list here
+        #Initialize UI Elements
+        self.Utilization = ui.Utilization(self.p1,self.Profile.incexpcat,self.UpdateUtilization,dt.date.today())
         self.ACCLIST = ui.AccountList(self.p1,self.Profile.accounts,self.New_Account,self.Del_Account,self.BKRecAcc,dt.date.today())
 
-        self.Utilization.grid(column = 0, row = 4, rowspan = 2)
+        self.Utilization.F.grid(column = 1, row = 4)
         self.ACCLIST.Acc.grid(column = 2, row = 4, rowspan = 2)
-        self.ExpChart.grid(column = 4, row = 4, rowspan = 2)
 
 
-        #####Page 2#####
+
+        ##### Page 2: Income #####
         self.PieChartIncome = ttk.Frame(self.p2)
 
         self.IncomeTable = ui.IncExpGrid(self.p2,"Income",self.Profile.incexpcat,self.New_IncExp,self.Del_IncExp,self.BKRecIncExp,dt.date.today(),self.BKNewDateIncExp)
         self.IncomeTable.IEGrid.grid(row = 0,column = 0, sticky = 'nsew')
         self.PieChartIncome.grid(row = 0, column = 1)
 
-        #####Page 3#####
+        ##### Page 3: Expenses #####
         self.PieChartExpenses = ttk.Frame(self.p3)
 
         self.ExpenseTable = ui.IncExpGrid(self.p3,"Expense",self.Profile.incexpcat,self.New_IncExp,self.Del_IncExp,self.BKRecIncExp,dt.date.today(),self.BKNewDateIncExp)
         self.ExpenseTable.IEGrid.grid(row = 0,column = 0, sticky = 'nsew')
         self.PieChartExpenses.grid(row = 0, column = 1)
 
-        #####Page 4#####
-        self.TimeChart = ttk.Frame(self.p4)
-        ttk.Label(self.p4, text = "Accounts Over Time").grid(row = 0, column = 0)
-        ttk.Button(self.p4, text = "Record Current Values").grid(row = 0, column = 1)
+        ##### Page 4: Savings #####
+        self.PieChartSavings = ttk.Frame(self.p4)
 
-        self.TimeChart.grid(row = 1, column = 1)
+        self.SavingsTable = ui.IncExpGrid(self.p4,"Savings",self.Profile.incexpcat,self.New_IncExp,self.Del_IncExp,self.BKRecIncExp,dt.date.today(),self.BKNewDateIncExp)
+        self.SavingsTable.IEGrid.grid(row = 0,column = 0, sticky = 'nsew')
+        self.PieChartIncome.grid(row = 0, column = 1)
 
         #####Page 5#####
 
@@ -91,6 +94,13 @@ class MainGui:
         #####Page 7#####
         ttk.Label(self.p7, text = "Records: ").grid(row = 0, column = 0, sticky = 'w')
         self.RecordSheet = tk.Text(self.p7)
+
+        #####
+        self.TimeChart = ttk.Frame(self.p4)
+        ttk.Label(self.p4, text = "Accounts Over Time").grid(row = 0, column = 0)
+        ttk.Button(self.p4, text = "Record Current Values").grid(row = 0, column = 1)
+
+        self.TimeChart.grid(row = 1, column = 1)
 
 
         self.RecordSheet.grid(row = 1, column = 0)
@@ -139,11 +149,13 @@ class MainGui:
         self.Profile.New_IncExp_Catagory(name,Type,Color)
         self.UpdateExpense()
         self.UpdateIncome()
+        self.UpdateSavings()
 
     def BKDel_IncExp(self,name):
         self.Profile.Del_IncExp_Catagory(name)
         self.UpdateExpense()
         self.UpdateIncome()
+        self.UpdateSavings()
 
     def BKNewDateIncExp(self,Type,date):
         List = list(self.Profile.incexpcat.keys())
@@ -152,11 +164,13 @@ class MainGui:
                 self.Profile.incexpcat[i].New_Value(date,0)
         self.UpdateExpense()
         self.UpdateIncome()
+        self.UpdateSavings()
 
     def BKRecIncExp(self,cat,date,value):
         self.Profile.incexpcat[cat].New_Value(date,value)
         self.UpdateExpense()
         self.UpdateIncome()
+        self.UpdateSavings()
 
     def BKNew_Acc(self,name,Type,Color):
         self.Profile.New_Account(name,Type,Color)
@@ -195,10 +209,25 @@ class MainGui:
         self.ExpenseTable = ui.IncExpGrid(self.p3,"Expense",self.Profile.incexpcat,self.New_IncExp,self.Del_IncExp,self.BKRecIncExp,ED,self.BKNewDateIncExp)
         self.ExpenseTable.IEGrid.grid(row = 0,column = 0, sticky = 'nsew')
 
+    def UpdateSavings(self):
+        ED = self.SavingsTable.date.get()
+        self.SavingsTable.IEGrid.destroy()
+        self.SavingsTable = ui.IncExpGrid(self.p4,"Savings",self.Profile.incexpcat,self.New_IncExp,self.Del_IncExp,self.BKRecIncExp,ED,self.BKNewDateIncExp)
+        self.SavingsTable.IEGrid.grid(row = 0,column = 0, sticky = 'nsew')
+
+    def UpdateUtilization(self):
+        predate = self.Utilization.Date.get()
+        print(predate)
+        self.Utilization.F.destroy()
+        self.Utilization = ui.Utilization(self.p1,self.Profile.incexpcat,self.UpdateUtilization,predate)
+        self.Utilization.F.grid(column = 1, row = 4)
+
     def UpdateAll(self):
         self.UpdateAcc()
         self.UpdateExpense()
         self.UpdateIncome()
+        self.UpdateSavings()
+        self.UpdateUtilization()
 
 
 

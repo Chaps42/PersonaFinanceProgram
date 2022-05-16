@@ -2,8 +2,21 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
 from tkinter import colorchooser
-
+from turtle import bgcolor
+from setuptools import Command
+import tkmacosx as tc
+from sys import platform as OS 
 import FileTypes as ft
+
+
+def ColorButton(root,color,ColorChoseFunc):
+    if OS == "darwin":
+        B1 = tk.Button(root, highlightbackground=color,command=ColorChoseFunc,height= 1,width= 20)
+        return B1
+    if OS == "win32" or OS == "win64":
+        B1 = ttk.Button(root,command = ColorChoseFunc,bg = color,height= 1,width= 20)
+        return B1
+        
 
 #New Window Classes
         
@@ -50,14 +63,19 @@ class WinLoadProfile:
         self.update = update
         
         self.filename = tk.filedialog.askopenfilename() #Ask for filename
+        self.password = tk.StringVar()
         self.t = ttk.Frame(self.master)
         ttk.Label(self.t, text = "Password").grid(row = 0, column = 0)
-        ttk.Entry(self.t).grid(row = 0, column = 1)
+        ttk.Entry(self.t, textvariable= self.password).grid(row = 0, column = 1)
         ttk.Button(self.t, text = "Continue", command = self.Load_Profile).grid(row = 0, column =  2)
         self.t.grid()
 
     def Load_Profile(self):
-        update
+        print("Loading...")
+        TempP = ft.Profile('','',self.filename)
+        TempP.Load_Profile(self.filename,self.password.get())
+        self.update(TempP)
+        self.master.destroy()
 
 class WinNewAccount:
     def __init__(self,master,func):
@@ -65,7 +83,7 @@ class WinNewAccount:
         self.func = func
 
         self.Name = tk.StringVar()
-        self.Color = tk.StringVar(value = '#ff00ff')
+        self.Color = '#ff00ff'
         self.Type = tk.StringVar(value = 'Asset')
 
         self.values = {"RadioButton 1":'Asset', "RadioButton 2":'Debt'}
@@ -78,10 +96,24 @@ class WinNewAccount:
         ttk.Radiobutton(self.t,text = "Debt", variable = self.Type, value = "Debt").grid(row = 1, column = 2)
         ttk.Button(self.t, text = "Continue", command = self.New_Account).grid(row = 3, column =  2)
         ttk.Button(self.t, text = "Cancel", command = self.master.destroy).grid(row = 3, column = 1)
+
+        ttk.Label(self.t, text = "Color: ").grid(row = 2, column = 0)
+        self.CButton = ColorButton(self.t,self.Color,self.ColorChose)
+        self.CButton.grid(row = 2, column = 1,columnspan = 2)
+
         self.t.grid()
 
+    def ColorChose(self):
+        tc = colorchooser.askcolor()
+        newcolor = tc[1]
+        self.Color = newcolor
+        self.CButton.destroy()
+        self.CButton = ColorButton(self.t,self.Color,self.ColorChose)
+        self.CButton.grid(row = 2, column = 1,columnspan = 2)
+        self.Color = newcolor
+
     def New_Account(self):
-        self.func(self.Name.get(),self.Type.get(),self.Color.get())
+        self.func(self.Name.get(),self.Type.get(),self.Color)
         self.master.destroy()
 
 class WinDelAccount:
@@ -105,6 +137,7 @@ class WinDelAccount:
     def Del_Account(self):
         self.func(self.n.get())
         self.master.destroy()
+        
 
 class WinNewIncExp:
     def __init__(self,master,newinc,Type):
@@ -125,21 +158,26 @@ class WinNewIncExp:
         ttk.Label(self.t, text = "Type:").grid(row = 1, column = 0)
         ttk.Radiobutton(self.t,text = "Income", variable = self.Type, value = "Income").grid(row = 1, column = 1)
         ttk.Radiobutton(self.t,text = "Expense", variable = self.Type, value = "Expense").grid(row = 1, column = 2)
-        ttk.Label(self.t, text = "Color").grid(row = 3, column = 0)
-        ttk.Button(self.t,command = self.ColorChose).grid(row = 3, column = 1,columnspan = 2)
-        
+        ttk.Label(self.t, text = "Color: ").grid(row = 3, column = 0)
+        self.CButton = ColorButton(self.t,self.Color,self.ColorChose)
+        self.CButton.grid(row = 3, column = 1,columnspan = 2)
         
         ttk.Button(self.t, text = "Continue", command = self.New_Catagory).grid(row = 4, column =  2)
         ttk.Button(self.t, text = "Cancel", command = self.master.destroy).grid(row = 4, column = 1)
         
         self.t.grid()
 
-    def ColorChose():
-        colorchooser.askcolor(initialcolor=clr)
-
+    def ColorChose(self):
+        tc = colorchooser.askcolor()
+        newcolor = tc[1]
+        self.Color = newcolor
+        self.CButton.destroy()
+        self.CButton = ColorButton(self.t,self.Color,self.ColorChose)
+        self.CButton.grid(row = 3, column = 1,columnspan = 2)
+        self.Color = newcolor
 
     def New_Catagory(self):
-        self.newinc(self.Name.get(),self.Type.get(),self.Color.get())
+        self.newinc(self.Name.get(),self.Type.get(),self.Color)
         self.master.destroy()
 
 class WinDelIncExp:
