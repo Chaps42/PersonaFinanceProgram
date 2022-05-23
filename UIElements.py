@@ -1,12 +1,13 @@
 import tkinter as tk
 import datetime as dt
-from tkinter import Variable, ttk
+from tkinter import RIDGE, Variable, ttk
 from tkinter import filedialog
 from tkinter import colorchooser
-import
+import numpy as np
 from sys import platform as OS 
 import FileTypes as ft
 from matplotlib.figure import Figure as Fig
+import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, 
 NavigationToolbar2Tk)
 
@@ -181,48 +182,195 @@ class IncExpGrid:
                     self.RecIncExp(cat,date,value)
 
 class CircleGraph:
-    def __init__(self,master,Type,Profile,update):
+    def __init__(self,master,Type,Profile,update,prevdate):
         self.master = master
         self.Profile = Profile
         self.Type = Type
-        self.Update = updateˆ
+        self.Update = update
         self.F = ttk.Frame(self.master)
+        self.Date = tk.StringVar(value = prevdate)
+        self.DateList = []
+        self.Predate = prevdate
 
-        if Type == "Overview":
+        if self.Type == "Expenses":
+            IncExps = self.Profile.incexpcat
+            Cats = list(self.Profile.incexpcat.keys())
+
+            #Date manipulation for cbox
+            for names in Cats:
+                if IncExps[names].type == "Expense":
+                    TempDs = list(IncExps[names].values.keys()) #Could append directly to library
+                    for i in range(len(TempDs)): #And Remove duplicates somehow easily
+                        if TempDs[i] not in self.DateList:
+                            self.DateList.append(TempDs[i]) #List of all catagories and dates
+            
+            if not self.DateList:
+                self.Date = tk.StringVar(value = self.Predate)
+            if self.DateList and self.Date.get() != str(dt.date.today()):
+                self.Date = tk.StringVar(value = self.Predate)
+            if self.DateList and self.Date.get() == str(dt.date.today()):
+                self.Date = tk.StringVar(value = max(self.DateList))
+        
+            self.DateList.sort(reverse=True)
+
 
             CBox = ttk.Combobox(self.F,textvariable = self.Date,validatecommand=self.Update,validate='focusout')
             CBox['values'] = self.DateList
-            CBox.current()        
+            CBox.current() 
+
+            dato = self.Date.get()
+            Values = []
+            Labels = []
+            Colors = []
+
+            for names in Cats:
+                INCEXP = IncExps[names]
+                if INCEXP.type == "Expense":
+                    Labels.append(names)
+                    Colors.append(INCEXP.color)
+                    try: Values.append(INCEXP.values[dato])
+                    except KeyError: Values.append(0)
 
 
-            fig = Fig(figsize = (5, 5),dpi = 100)
+            #fig = Fig(figsize = (2, 2),dpi = 100)
             # adding the subplot
-            plot1 = fig.add_subplot(111)
-            plot1.plot(y)
+            figure, axes = plt.subplots(figsize = (2,2))
+            plt.pie(Values,labels = Labels,colors = Colors,startangle = 90,counterclock = False)
+            Circ = plt.Circle((0,0), 0.7, color='white')
+            plt.title("Expense Pie Chart")
+            plt.legend()
+
+ 
+            axes.set_aspect( 1 )
+            axes.add_artist( Circ )
             # creating the Tkinter canvas
             # containing the Matplotlib figure
-            canvas = FigureCanvasTkAgg(fig,master = self.F)  
+            canvas = FigureCanvasTkAgg(figure,master = self.F)  
             canvas.draw()
-            canvas.get_tk_widget().pack() # placing the canvas on the Tkinter window
-            toolbar = NavigationToolbar2Tk(canvas,self.F)# creating the Matplotlib toolbar
-            toolbar.update()
-            canvas.get_tk_widget().pack()# placing the toolbar on the Tkinter window
+            canvas.get_tk_widget().grid(row = 1,column = 0) # placing the canvas on the Tkinter window
+            CBox.grid(row = 0,column = 0)
 
-        if Type == "Expenses":
+        if self.Type == "Incomes":
+            IncExps = self.Profile.incexpcat
+            Cats = list(self.Profile.incexpcat.keys())
 
-        if Type == "Incomes":
+            #Date manipulation for cbox
+            for names in Cats:
+                if IncExps[names].type == "Income":
+                    TempDs = list(IncExps[names].values.keys()) #Could append directly to library
+                    for i in range(len(TempDs)): #And Remove duplicates somehow easily
+                        if TempDs[i] not in self.DateList:
+                            self.DateList.append(TempDs[i]) #List of all catagories and dates
+            
+            if not self.DateList:
+                self.Date = tk.StringVar(value = self.Predate)
+            if self.DateList and self.Date.get() != str(dt.date.today()):
+                self.Date = tk.StringVar(value = self.Predate)
+            if self.DateList and self.Date.get() == str(dt.date.today()):
+                self.Date = tk.StringVar(value = max(self.DateList))
+            
+            self.DateList.sort(reverse=True)
 
-        if Type == "Savings":
 
-        if Type == "Grouping":
+            CBox = ttk.Combobox(self.F,textvariable = self.Date,validatecommand=self.Update,validate='focusout')
+            CBox['values'] = self.DateList
+            CBox.current() 
+
+            dato = self.Date.get()
+            Values = []
+            Labels = []
+            Colors = []
+
+            for names in Cats:
+                INCEXP = IncExps[names]
+                if INCEXP.type == "Income":
+                    Labels.append(names)
+                    Colors.append(INCEXP.color)
+                    try: Values.append(INCEXP.values[dato])
+                    except KeyError: Values.append(0)
+
+
+            #fig = Fig(figsize = (2, 2),dpi = 100)
+            # adding the subplot
+            figure, axes = plt.subplots(figsize = (2,2))
+            plt.pie(Values,labels = Labels,colors = Colors,startangle = 90,counterclock = False)
+            Circ = plt.Circle((0,0), 0.7, color='white')
+            plt.title("Incomes Pie Chart")
+            plt.legend()
+
+ 
+            axes.set_aspect( 1 )
+            axes.add_artist( Circ )
+            # creating the Tkinter canvas
+            # containing the Matplotlib figure
+            canvas = FigureCanvasTkAgg(figure,master = self.F)  
+            canvas.draw()
+            canvas.get_tk_widget().grid(row = 1,column = 0) # placing the canvas on the Tkinter window
+            CBox.grid(row = 0,column = 0)
+
+        if self.Type == "Savings":
+            IncExps = self.Profile.incexpcat
+            Cats = list(self.Profile.incexpcat.keys())
+
+            #Date manipulation for cbox
+            for names in Cats:
+                if IncExps[names].type == "Saving":
+                    TempDs = list(IncExps[names].values.keys()) #Could append directly to library
+                    for i in range(len(TempDs)): #And Remove duplicates somehow easily
+                        if TempDs[i] not in self.DateList:
+                            self.DateList.append(TempDs[i]) #List of all catagories and dates
+            
+            if not self.DateList:
+                self.Date = tk.StringVar(value = self.Predate)
+            if self.DateList and self.Date.get() != str(dt.date.today()):
+                self.Date = tk.StringVar(value = self.Predate)
+            if self.DateList and self.Date.get() == str(dt.date.today()):
+                self.Date = tk.StringVar(value = max(self.DateList))
+            
+            self.DateList.sort(reverse=True)
+
+
+            CBox = ttk.Combobox(self.F,textvariable = self.Date,validatecommand=self.Update,validate='focusout')
+            CBox['values'] = self.DateList
+            CBox.current() 
+
+            dato = self.Date.get()
+            Values = []
+            Labels = []
+            Colors = []
+
+            for names in Cats:
+                INCEXP = IncExps[names]
+                if INCEXP.type == "Saving":
+                    Labels.append(names)
+                    Colors.append(INCEXP.color)
+                    try: Values.append(INCEXP.values[dato])
+                    except KeyError: Values.append(0)
+
+
+            #fig = Fig(figsize = (2, 2),dpi = 100)
+            # adding the subplot
+            figure, axes = plt.subplots(figsize = (2,2))
+            plt.pie(Values,labels = Labels,colors = Colors,startangle = 90,counterclock = False)
+            Circ = plt.Circle((0,0), 0.7, color='white')
+            plt.title("Savings Pie Chart")
+            plt.legend()
+
+ 
+            axes.set_aspect( 1 )
+            axes.add_artist( Circ )
+            # creating the Tkinter canvas
+            # containing the Matplotlib figure
+            canvas = FigureCanvasTkAgg(figure,master = self.F)  
+            canvas.draw()
+            canvas.get_tk_widget().grid(row = 1,column = 0) # placing the canvas on the Tkinter window
+            CBox.grid(row = 0,column = 0)
+
+        '''if Type == "Grouping":
 
         if Type == "Vacation":
 
-        if Type == "Graphs":
-
-
-
-
+        if Type == "Graphs": '''
 
 class Utilization:
     def __init__(self,master,IncExp,update,predate):
@@ -242,11 +390,11 @@ class Utilization:
         Savings = 0
 
         ttk.Label(self.F,text = "Utilization").grid(row = 0, column = 0)
-        ttk.Label(self.F,text = "Date").grid(row = 1, column = 0)
-        ttk.Label(self.F,text = "Income: ").grid(row = 2, column = 0)
-        ttk.Label(self.F,text = "Savings: ").grid(row = 3, column = 0)
-        ttk.Label(self.F,text = "Expenses: ").grid(row = 4, column = 0)
-        ttk.Label(self.F,text = "Remaining Budget: ").grid(row = 5, column = 0)
+        ttk.Label(self.F,text = "Date").grid(row = 1, column = 1)
+        ttk.Label(self.F,text = "Income: ").grid(row = 2, column = 1)
+        ttk.Label(self.F,text = "Savings: ").grid(row = 3, column = 1)
+        ttk.Label(self.F,text = "Expenses: ").grid(row = 4, column = 1)
+        ttk.Label(self.F,text = "Remaining Budget: ").grid(row = 5, column = 1)
 
         Keys = list(IncExp.keys()) #Get Unique Dates and sort them with most recent first
         for i in Keys:
@@ -255,12 +403,12 @@ class Utilization:
                     self.DateList.append(j)
         self.DateList.sort(reverse=True)
 
-        if self.DateList and predate == dt.date.today():
+        if not self.DateList:
+            self.Date = tk.StringVar(value = self.Predate)
+        if self.DateList and self.Date.get() != str(dt.date.today()):
+            self.Date = tk.StringVar(value = self.Predate)
+        if self.DateList and self.Date.get() == str(dt.date.today()):
             self.Date = tk.StringVar(value = max(self.DateList))
-        elif not self.DateList:
-            self.Date = tk.StringVar(value = self.Predate)
-        elif self.DateList and predate != dt.date.today():
-            self.Date = tk.StringVar(value = self.Predate)
             
         CBox = ttk.Combobox(self.F,textvariable = self.Date,validatecommand=self.Update,validate='focusout')
         CBox['values'] = self.DateList
@@ -279,19 +427,87 @@ class Utilization:
                 except KeyError: Savings += 0
 
 
+        Remaining = Income-Expenses-Savings
+        if Income ==0 and Remaining == 0:
+            Income = 1
+            Remaining = 1
+        if Income ==0:
+            Income =1
+        PercentRemaining = 100*Remaining/Income
+
+        Data = np.array([Expenses,Savings,Remaining])
+        Labels = ["Expenses","Savings","Remaining"]
+        Colors = ["#F0684A","#59D94C","#132591"]
+
+        if Remaining <0:
+            Data = np.array([Expenses,Savings])
+            Labels = ["Expenses","Savings"]
+            Colors = ["#EC210C","#59D94C"]
+
+        if Savings == 0 and Expenses == 0:
+            Data = np.array([Remaining])
+            Labels = ["Remaining"]
+            Colors = ["#132591"]
+
+        figure, axes = plt.subplots(figsize = (2,2))
+        plt.pie(Data,labels = Labels,colors = Colors,startangle = 90,counterclock = False)
+        Circ = plt.Circle((0,0), 0.7, color='white')
+        plt.text(-.3,-.1,str(PercentRemaining)[:5]+"%")
+        plt.title("Budget Utilization")
+        axes.set_aspect( 1 )
+        axes.add_artist( Circ )
+        canvas = FigureCanvasTkAgg(figure,master = self.F)  
+        canvas.draw()
+        canvas.get_tk_widget().grid(row = 1,column = 0,rowspan = 5) # placing the canvas on the Tkinter windo
+
         Total = Income - Expenses - Savings
         self.Income = tk.StringVar(value = "$"+str(Income))
         self.Expenses = tk.StringVar(value = "$"+str(Expenses))
         self.Savings = tk.StringVar(value = "$"+str(Savings))
         self.Total = tk.StringVar(value = "$"+str(Total))
         
-        CBox.grid(row = 1, column = 1)
-        ttk.Entry(self.F,textvariable = self.Income).grid(row = 2, column = 1)
-        ttk.Entry(self.F,textvariable = self.Expenses).grid(row = 3, column = 1)
-        ttk.Entry(self.F,textvariable = self.Savings).grid(row = 4, column = 1)
-        ttk.Entry(self.F,textvariable = self.Total).grid(row = 5, column = 1)
+        CBox.grid(row = 1, column = 2)
+        ttk.Entry(self.F,textvariable = self.Income).grid(row = 2, column = 2)
+        ttk.Entry(self.F,textvariable = self.Expenses).grid(row = 3, column = 2)
+        ttk.Entry(self.F,textvariable = self.Savings).grid(row = 4, column = 2)
+        ttk.Entry(self.F,textvariable = self.Total).grid(row = 5, column = 2)
+
+class RecurringTrans:
+    def __init__(self,master,Recurring,NewRecur,StartRecur,StopRecur,DelRecur,SaveRecur):
+        self.master = master
+        self.F = ttk.Frame(self.master)
+        self.RecuList = list(Recurring.keys())
+        self.Recu = Recurring
+
+        RS = 4
+
+        ttk.Label(self.F, text = "Recurring Transactions").grid(row = 0, column = 0,sticky = 'w')
+        ttk.Button(self.F,text = "New Recurring",command = NewRecur).grid(row = 1, column = 0,sticky = 'w')
+        ttk.Button(self.F,text = "Disable Recurring",command = StopRecur).grid(row = 2, column = 1,sticky = 'w')
+        ttk.Button(self.F,text = "Enable Recurring",command = StartRecur).grid(row = 1, column = 1,sticky = 'w')
+        ttk.Button(self.F,text = "Delete Recurring",command = DelRecur).grid(row = 2, column = 0,sticky = 'w')
+        ttk.Button(self.F,text = "Save Recurring",command = SaveRecur).grid(row = 3, column = 1,sticky = 'w')
+        ttk.Label(self.F, text = "Recurring Incomes").grid(row = RS, column = 0,sticky = 'w')
+        ttk.Label(self.F, text = "Recurring Payments").grid(row = RS, column = 2,sticky = 'w')
+
+        self.VarEntrys = [tk.StringVar() for i in range(len(self.RecuList))]
+        RI = 0
+        RE = 0
+        for I in range(len(self.RecuList)):
+            if self.Recu[self.RecuList[I]].type == "Income":
+                self.VarEntrys[I] = tk.StringVar(value = self.Recu[self.RecuList[I]].value)
+                ttk.Label(self.F,text = str(self.RecuList[I])+": ").grid(row = RS+RI,column = 0)
+                ttk.Entry(self.F,textvariable=self.VarEntrys[I]).grid(row = RS+RI,column = 1)
+                RI += 1
+            if self.Recu[self.RecuList[I]].type == "Expense":
+                self.VarEntrys[I] = tk.StringVar(value = self.Recu[self.RecuList[I]].value)
+                ttk.Label(self.F,text = str(self.RecuList[I])+": ").grid(row = RS+RE,column = 2)
+                ttk.Entry(self.F,textvariable=self.VarEntrys[I]).grid(row = RS+RE,column = 3)
+                RE += 1
+
 
         
+
         
 
 

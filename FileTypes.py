@@ -229,7 +229,6 @@ class Profile:
         return f.readline().replace("\n","")
 
         
-
 class Account:
     def __init__(self,name,Type,Color):
         self.name = name
@@ -270,10 +269,8 @@ class RecurringTransaction:
         self.name = name
         self.value = value
         self.type = Type
-        if date is None:
-            self.startdate = dt.today()
-        else:
-            self.startdate = date
+        self.Enabled = True
+        self.startdate = date
 
     def Change_Value(self,value):
         self.value = value

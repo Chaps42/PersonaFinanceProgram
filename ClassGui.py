@@ -46,42 +46,38 @@ class MainGui:
         ttk.Button(self.p1, text = "Load Profile",command = self.Load_Profile).grid(column = 0, row = 3)
         ttk.Button(self.p1, text = "Save",command = self.BKSave).grid(column = 1, row = 2)
 
-
         self.Acc = ttk.Button(self.p1, text = "Test",command = self.test).grid(column = 1, row = 3)
 
-        #Initialize UI Elements
         self.Utilization = ui.Utilization(self.p1,self.Profile.incexpcat,self.UpdateUtilization,dt.date.today())
         self.ACCLIST = ui.AccountList(self.p1,self.Profile.accounts,self.New_Account,self.Del_Account,self.BKRecAcc,dt.date.today())
-
-        self.Utilization.F.grid(column = 1, row = 4)
-        self.ACCLIST.Acc.grid(column = 2, row = 4, rowspan = 2)
-
-
+        self.MainExpenseGraph = ui.CircleGraph(self.p1,"Expenses",self.Profile,self.UpdateMainExpenseGraph,dt.date.today())
+        
+        self.Utilization.F.grid(column = 0, row = 4)
+        self.ACCLIST.Acc.grid(column = 1, row = 4)
+        self.MainExpenseGraph.F.grid(column = 2, row = 4)
 
         ##### Page 2: Income #####
-        self.PieChartIncome = ttk.Frame(self.p2)
-
         self.IncomeTable = ui.IncExpGrid(self.p2,"Income",self.Profile.incexpcat,self.New_IncExp,self.Del_IncExp,self.BKRecIncExp,dt.date.today(),self.BKNewDateIncExp)
+        self.IncomeGraph = ui.CircleGraph(self.p2,"Incomes",self.Profile,self.UpdateIncomeGraph,dt.date.today())
         self.IncomeTable.IEGrid.grid(row = 0,column = 0, sticky = 'nsew')
-        self.PieChartIncome.grid(row = 0, column = 1)
+        self.IncomeGraph.F.grid(row = 0, column = 1)
 
         ##### Page 3: Expenses #####
-        self.PieChartExpenses = ttk.Frame(self.p3)
-
         self.ExpenseTable = ui.IncExpGrid(self.p3,"Expense",self.Profile.incexpcat,self.New_IncExp,self.Del_IncExp,self.BKRecIncExp,dt.date.today(),self.BKNewDateIncExp)
+        self.ExpenseGraph = ui.CircleGraph(self.p3,"Expenses",self.Profile,self.UpdateExpenseGraph,dt.date.today())
         self.ExpenseTable.IEGrid.grid(row = 0,column = 0, sticky = 'nsew')
-        self.PieChartExpenses.grid(row = 0, column = 1)
+        self.ExpenseGraph.F.grid(row = 0, column = 1)
+
 
         ##### Page 4: Savings #####
-        self.PieChartSavings = ttk.Frame(self.p4)
-
         self.SavingsTable = ui.IncExpGrid(self.p4,"Savings",self.Profile.incexpcat,self.New_IncExp,self.Del_IncExp,self.BKRecIncExp,dt.date.today(),self.BKNewDateIncExp)
+        self.SavingsGraph = ui.CircleGraph(self.p4,"Savings",self.Profile,self.UpdateSavingsGraph,dt.date.today())
+        self.SavingsGraph.F.grid(row = 0, column = 1)
         self.SavingsTable.IEGrid.grid(row = 0,column = 0, sticky = 'nsew')
-        self.PieChartIncome.grid(row = 0, column = 1)
 
-        #####Page 5#####
+        #####Page 5: Groupings #####
 
-        #####Page 6#####
+        ##### Page 6: Vacations#####
         ttk.Label(self.p6, text = "Recurring Transactions").grid(row = 0, column = 0, sticky = 'w')
 
         self.G = ttk.Frame(self.p6)
@@ -195,7 +191,7 @@ class MainGui:
         predate = self.ACCLIST.date.get()
         self.ACCLIST.Acc.destroy()
         self.ACCLIST = ui.AccountList(self.p1,self.Profile.accounts,self.New_Account,self.Del_Account,self.BKRecAcc, predate)
-        self.ACCLIST.Acc.grid(column = 2, row = 4, rowspan = 2)
+        self.ACCLIST.Acc.grid(column = 1, row = 4, rowspan = 2)
 
     def UpdateIncome(self):
         ID = self.IncomeTable.date.get()
@@ -217,10 +213,34 @@ class MainGui:
 
     def UpdateUtilization(self):
         predate = self.Utilization.Date.get()
-        print(predate)
         self.Utilization.F.destroy()
         self.Utilization = ui.Utilization(self.p1,self.Profile.incexpcat,self.UpdateUtilization,predate)
-        self.Utilization.F.grid(column = 1, row = 4)
+        self.Utilization.F.grid(column = 0, row = 4)
+
+    def UpdateExpenseGraph(self):
+        predate = self.ExpenseGraph.Date.get()
+        self.ExpenseGraph.F.destroy()
+        self.ExpenseGraph = ui.CircleGraph(self.p3,"Expenses",self.Profile,self.UpdateExpenseGraph,predate)
+        self.ExpenseGraph.F.grid(row = 0, column = 1)
+
+    def UpdateMainExpenseGraph(self):
+        predate = self.MainExpenseGraph.Date.get()
+        self.MainExpenseGraph.F.destroy()
+        self.MainExpenseGraph = ui.CircleGraph(self.p1,"Expenses",self.Profile,self.UpdateMainExpenseGraph,predate)
+        self.MainExpenseGraph.F.grid(column = 2, row = 4)
+
+    def UpdateIncomeGraph(self):
+        predate = self.IncomeGraph.Date.get()
+        self.IncomeGraph.F.destroy()
+        self.IncomeGraph = ui.CircleGraph(self.p2,"Incomes",self.Profile,self.UpdateIncomeGraph,predate)
+        self.IncomeGraph.F.grid(row = 0, column = 1)
+
+    def UpdateSavingsGraph(self):
+        predate = self.SavingsGraph.Date.get()
+        self.SavingsGraph.F.destroy()
+        self.SavingsGraph = ui.CircleGraph(self.p4,"Savings",self.Profile,self.UpdateSavingsGraph,predate)
+        self.SavingsGraph.F.grid(row = 0, column = 1)
+
 
     def UpdateAll(self):
         self.UpdateAcc()
@@ -228,6 +248,10 @@ class MainGui:
         self.UpdateIncome()
         self.UpdateSavings()
         self.UpdateUtilization()
+        self.UpdateSavingsGraph()
+        self.UpdateIncomeGraph()
+        self.UpdateMainExpenseGraph()
+        self.UpdateExpenseGraph()
 
 
 

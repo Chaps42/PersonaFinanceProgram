@@ -86,8 +86,6 @@ class WinNewAccount:
         self.Color = '#ff00ff'
         self.Type = tk.StringVar(value = 'Asset')
 
-        self.values = {"RadioButton 1":'Asset', "RadioButton 2":'Debt'}
-
         self.t = ttk.Frame(self.master)
         ttk.Label(self.t, text = "Account Name:").grid(row = 0, column = 0)
         ttk.Entry(self.t,textvariable = self.Name).grid(row = 0, column = 1)
@@ -148,8 +146,6 @@ class WinNewIncExp:
         self.Name = tk.StringVar()
         self.Color = tk.StringVar(value = '#ff00ff')
         self.Type = tk.StringVar(value = Type)
-
-        self.values = {"RadioButton 1":'Income', "RadioButton 2":'Expense'}
         
         ttk.Label(self.t, text = "Catagory Name:").grid(row = 0, column = 0)
         ttk.Entry(self.t,textvariable = self.Name).grid(row = 0, column = 1,columnspan = 2)
@@ -158,6 +154,7 @@ class WinNewIncExp:
         ttk.Label(self.t, text = "Type:").grid(row = 1, column = 0)
         ttk.Radiobutton(self.t,text = "Income", variable = self.Type, value = "Income").grid(row = 1, column = 1)
         ttk.Radiobutton(self.t,text = "Expense", variable = self.Type, value = "Expense").grid(row = 1, column = 2)
+        ttk.Radiobutton(self.t,text = "Saving", variable = self.Type, value = "Saving").grid(row = 1, column = 3)
         ttk.Label(self.t, text = "Color: ").grid(row = 3, column = 0)
         self.CButton = ColorButton(self.t,self.Color,self.ColorChose)
         self.CButton.grid(row = 3, column = 1,columnspan = 2)
