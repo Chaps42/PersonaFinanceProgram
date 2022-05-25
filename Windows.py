@@ -136,7 +136,6 @@ class WinDelAccount:
         self.func(self.n.get())
         self.master.destroy()
         
-
 class WinNewIncExp:
     def __init__(self,master,newinc,Type):
         self.master = master
@@ -154,7 +153,7 @@ class WinNewIncExp:
         ttk.Label(self.t, text = "Type:").grid(row = 1, column = 0)
         ttk.Radiobutton(self.t,text = "Income", variable = self.Type, value = "Income").grid(row = 1, column = 1)
         ttk.Radiobutton(self.t,text = "Expense", variable = self.Type, value = "Expense").grid(row = 1, column = 2)
-        ttk.Radiobutton(self.t,text = "Saving", variable = self.Type, value = "Saving").grid(row = 1, column = 3)
+        ttk.Radiobutton(self.t,text = "Savings", variable = self.Type, value = "Savings").grid(row = 1, column = 3)
         ttk.Label(self.t, text = "Color: ").grid(row = 3, column = 0)
         self.CButton = ColorButton(self.t,self.Color,self.ColorChose)
         self.CButton.grid(row = 3, column = 1,columnspan = 2)

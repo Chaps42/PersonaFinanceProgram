@@ -32,8 +32,8 @@ class MainGui:
         self.frame.add(self.p2, text = "Income")
         self.frame.add(self.p3, text = "Expenses")
         self.frame.add(self.p4, text = "Savings")
-        self.frame.add(self.p5, text = "Groupings")
-        self.frame.add(self.p6, text = "Vacations")
+        self.frame.add(self.p5, text = "Vacations")
+        self.frame.add(self.p6, text = "Groupings")
         self.frame.add(self.p7, text = "Accounts Over Time")
         self.frame.add(self.p8, text = "Graphs")
         self.frame.add(self.p9, text = "Reccuring Transactions")
@@ -75,9 +75,12 @@ class MainGui:
         self.SavingsGraph.F.grid(row = 0, column = 1)
         self.SavingsTable.IEGrid.grid(row = 0,column = 0, sticky = 'nsew')
 
-        #####Page 5: Groupings #####
+        #####Page 5: Vacations #####
+        self.VacationTable = ui.VacationGrid(self.p5,self.Profile.vacations,self.profile.vaccats,self.BKNewVacCat,self.BKDel_VacCat,self.BKRecVacation,self.BKNewVac,self.BKDel_Vac,predate)
+        self.VacationGraph = ui.CircleGraph(self.p5,"Vacation",self.Profile)
 
-        ##### Page 6: Vacations#####
+
+        ##### Page 6: Groupings #####
         ttk.Label(self.p6, text = "Recurring Transactions").grid(row = 0, column = 0, sticky = 'w')
 
         self.G = ttk.Frame(self.p6)
@@ -102,6 +105,8 @@ class MainGui:
         self.RecordSheet.grid(row = 1, column = 0)
         #.grid all items to make them real
         self.frame.grid()
+
+        
 
 
     #####New Window Functions#####
@@ -146,12 +151,18 @@ class MainGui:
         self.UpdateExpense()
         self.UpdateIncome()
         self.UpdateSavings()
+        self.UpdateSavingsGraph()
+        self.UpdateIncomeGraph()
+        self.UpdateExpenseGraph()
 
     def BKDel_IncExp(self,name):
         self.Profile.Del_IncExp_Catagory(name)
         self.UpdateExpense()
         self.UpdateIncome()
         self.UpdateSavings()
+        self.UpdateSavingsGraph()
+        self.UpdateIncomeGraph()
+        self.UpdateExpenseGraph()
 
     def BKNewDateIncExp(self,Type,date):
         List = list(self.Profile.incexpcat.keys())
@@ -161,12 +172,18 @@ class MainGui:
         self.UpdateExpense()
         self.UpdateIncome()
         self.UpdateSavings()
+        self.UpdateSavingsGraph()
+        self.UpdateIncomeGraph()
+        self.UpdateExpenseGraph()
 
     def BKRecIncExp(self,cat,date,value):
         self.Profile.incexpcat[cat].New_Value(date,value)
         self.UpdateExpense()
         self.UpdateIncome()
         self.UpdateSavings()
+        self.UpdateSavingsGraph()
+        self.UpdateIncomeGraph()
+        self.UpdateExpenseGraph()
 
     def BKNew_Acc(self,name,Type,Color):
         self.Profile.New_Account(name,Type,Color)
@@ -181,6 +198,13 @@ class MainGui:
 
     def BKSave(self):
         self.Profile.Save_Profile(self.Profile.directory)
+
+    def BKNewVacCat(self):
+    def BKDel_VacCat(self):
+    def BKRecVacation(self):
+    def BKNewVac(self):
+    def BKDel_Vac(self):
+
 
     def test(self):
         print(self.Profile.accounts)
